@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist off-airfield landing permit — FOCA</title>
+<style>
+  :root { --ch-red: #FF0000; --ink: #1a1a1a; --box-bg: #f2f2f2; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--ink); margin: 0; background: #dedede; }
+  .toolbar {
+    position: sticky; top: 0; z-index: 10; background: #2b2f33; color: #fff;
+    padding: 10px 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 14px;
+  }
+  .toolbar a { color: #fff; text-decoration: none; opacity: .85; }
+  .toolbar a:hover { opacity: 1; }
+  .toolbar button {
+    background: var(--ch-red); color: #fff; border: none; padding: 8px 14px;
+    border-radius: 3px; cursor: pointer; font-size: 13px; font-family: inherit;
+  }
+  .toolbar button.secondary { background: #545a5f; }
+  .toolbar button:hover { filter: brightness(1.1); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .status { font-size: 12px; opacity: .8; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current { padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit; }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+
+  .header {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
+    padding-bottom: 16px; border-bottom: 2px solid var(--ch-red); margin-bottom: 20px;
+  }
+  .crest { width: 46px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country { font-size: 11px; line-height: 1.4; }
+  .header-right { text-align: right; font-size: 12px; line-height: 1.5; }
+  .header-right strong { display: block; font-size: 13px; }
+
+  h1.doc-title { font-size: 16px; margin: 4px 0 2px; font-weight: normal; }
+  .subtitle { font-size: 17px; margin: 4px 0 14px; font-weight: bold; line-height: 1.35; }
+
+  .info-box { background: var(--box-bg); border: 1px solid #ccc; padding: 12px 16px; font-size: 12.5px; line-height: 1.55; margin-bottom: 18px; }
+  .info-box .info-title { font-weight: bold; margin-bottom: 4px; }
+  .info-box .gap { margin-top: 8px; }
+  .info-box a { color: var(--ch-red); word-break: break-all; }
+
+  .lead-in { font-size: 13.5px; margin-bottom: 4px; font-weight: bold; }
+  .lead-in .note { font-weight: normal; font-style: italic; font-size: 12px; }
+
+  .checklist { border: 1px solid #999; margin-bottom: 4px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 14px; border-bottom: 1px solid #ddd; font-size: 13.5px; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ch-red); }
+  .check-item .num { font-weight: bold; min-width: 20px; }
+
+  .group-heading { font-weight: bold; font-size: 13.5px; margin: 16px 0 6px; }
+  .group-heading .sub { font-weight: normal; font-size: 12px; font-style: italic; display: block; margin-top: 2px; }
+
+  .progress { font-size: 13px; margin: 14px 0 20px; padding: 8px 14px; background: #eef4ec; border: 1px solid #ccd; }
+
+  .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
+  .admin-footer .admin-title { text-align: center; font-style: italic; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
+  .admin-footer table { width: 100%; border-collapse: collapse; }
+  .admin-footer td { padding: 1px 4px; vertical-align: top; }
+  .admin-footer .lbl { color: #777; }
+  .admin-footer .bottom-line { display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 3px; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none !important; }
+    .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
+    .header, .info-box, .checklist, .admin-footer {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .header { margin-bottom: 4px; padding-bottom: 4px; }
+    .subtitle { margin-bottom: 4px; }
+    .info-box { padding: 5px 14px; margin-bottom: 4px; line-height: 1.22; font-size: 11.5px; }
+    .info-box .gap { margin-top: 3px; }
+    .lead-in { margin-bottom: 2px; }
+    .checklist { margin-bottom: 1px; }
+    .check-item { padding: 2px 14px; font-size: 12.5px; }
+    .group-heading { margin: 3px 0 2px; font-size: 12.5px; }
+    .group-heading .sub { margin-top: 1px; }
+    .progress { margin: 4px 0 5px; padding: 4px 14px; }
+    .admin-footer { margin-top: 2px; padding-top: 2px; }
+    @page { size: A4; margin: 7mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../index_en.html">&larr; Overview</a>
+  <nav class="lang-menu" aria-label="Language">
+    <a href="../formulare_de/checkliste-aussenlandung-ausland.html">DE</a>
+    <a href="../formulare_fr/checkliste-aussenlandung-ausland.html">FR</a>
+    <a href="../formulare_it/checkliste-aussenlandung-ausland.html">IT</a>
+    <span class="lang-current">EN</span>
+  </nav>
+  <div class="spacer"></div>
+  <span class="status" id="statusText"></span>
+  <button type="button" class="secondary" id="loadBtn">Load</button>
+  <button type="button" class="secondary" id="saveBtn">Save</button>
+  <button type="button" id="printBtn">Print / Save as PDF</button>
+  <button type="button" class="secondary" id="mailBtn">Send by e-mail</button>
+</div>
+
+<form class="sheet" id="bazlForm" novalidate>
+
+  <div class="header">
+    <div class="header-left">
+      <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+        <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+        <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+      </svg>
+      <div class="country">
+        Schweizerische Eidgenossenschaft<br>
+        Confédération suisse<br>
+        Confederazione Svizzera<br>
+        Confederaziun svizra
+      </div>
+    </div>
+    <div class="header-right">
+      Federal Department of the Environment,<br>
+      Transport, Energy and Communications DETEC
+      <strong>Federal Office of Civil Aviation FOCA</strong>
+      Flight Operations Safety
+    </div>
+  </div>
+
+  <h1 class="doc-title">Checklist of documents to submit for an off-airfield landing permit:</h1>
+  <div class="subtitle">
+    Landing(s) outside an airfield/heliport<br>
+    with a helicopter registered abroad
+  </div>
+
+  <div class="info-box">
+    <div class="info-title">General information</div>
+    &gt; Legal basis: Ordinance on Off-Airfield Landings (AulaV; SR 748.132.3).<br>
+    &gt; For commercial flights, Art. 4, 5, 6, 7, 11, 12, 13, 15, 16, 18, 19, 25 and 30 apply in particular;
+    for non-commercial flights, Art. 4, 5, 6, 7, 11, 12, 13, 15, 16, 18, 19, 30 and 32.<br>
+    &gt; Consent of the landowner is a prerequisite.<br>
+    &gt; Landings in residential or nature-protection areas, above 1100 m AMSL, and at night are prohibited.<br>
+    &gt; Landings at a mountain landing site (GLP) are only possible with a Swiss MOU(H) pilot licence.<br>
+    &gt; Cross-border flights must be conducted via a customs airfield.<br>
+    &gt; If the landing takes place at an event, the organiser's consent is required.<br>
+    &gt; "High-risk SPO" flights additionally require a "cross-border high-risk authorisation" (see link).
+
+    <div class="gap">
+      &gt; Link to SPO information: <a href="https://www.bazl.admin.ch/spo" target="_blank" rel="noopener">https://www.bazl.admin.ch/spo</a><br>
+      &gt; Link to aviation obstacle maps: <a href="https://map.geo.admin.ch/?topic=aviation" target="_blank" rel="noopener">https://map.geo.admin.ch/?topic=aviation</a><br>
+      &gt; Link to Swiss airspace restrictions (DABS): <a href="https://www.skybriefing.com" target="_blank" rel="noopener">www.skybriefing.com</a>
+    </div>
+
+    <div class="gap">
+      &gt; Allow 10 working days for processing the application.<br>
+      &gt; The authorisation is granted for a maximum duration of 1 year.<br>
+      &gt; Fee CHF 500.- per authorisation (pursuant to Art. 38(1)(f)(1) GebV-BAZL; SR 748.112.11)<br>
+      &gt; The application must be submitted by the applicant by e-mail to <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a>.
+    </div>
+  </div>
+
+  <div class="lead-in">
+    E-mail application with the following details, resp. copies of documents enclosed:
+    <div class="note">Further information and/or documents may be requested if needed.</div>
+  </div>
+
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item1"><span><span class="num">1)</span> Name and address of the applicant</span></label>
+    <label class="check-item"><input type="checkbox" id="item2"><span><span class="num">2)</span> Name and address for invoicing (if different)</span></label>
+    <label class="check-item"><input type="checkbox" id="item3"><span><span class="num">3)</span> Desired flight type: CAT, SPO, NCC or NCO (only one possible per authorisation)</span></label>
+    <label class="check-item"><input type="checkbox" id="item4"><span><span class="num">4)</span> Period for which the authorisation is requested (max. 1 year possible)</span></label>
+  </div>
+
+  <div class="group-heading">
+    Pilot:
+    <span class="sub">For aviation safety reasons, it must be ensured that pilots are trained such that they meet
+    the basic requirements for off-airfield landings in topographically demanding terrain.</span>
+  </div>
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item5"><span><span class="num">5)</span> Details of training and experience regarding off-airfield landings (Art. 7a AulaV).</span></label>
+    <label class="check-item"><input type="checkbox" id="item6"><span><span class="num">6)</span> Pilot's self-declaration of knowledge of the relevant legislation and familiarity with the relevant public aeronautical publications (Art. 7b AulaV).</span></label>
+    <label class="check-item"><input type="checkbox" id="item7"><span><span class="num">7)</span> Pilot licence</span></label>
+    <label class="check-item"><input type="checkbox" id="item8"><span><span class="num">8)</span> Medical certificate</span></label>
+  </div>
+
+  <div class="group-heading">Only for CAT flights:</div>
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item9"><span><span class="num">9)</span> Air Operator Certificate AOC (EASA form 138)</span></label>
+    <label class="check-item"><input type="checkbox" id="item10"><span><span class="num">10)</span> Operations Specifications of the helicopter(s) (EASA form 139)</span></label>
+  </div>
+
+  <div class="group-heading">For all other flights: SPO, NCC, NCO</div>
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item11"><span><span class="num">11)</span> Certificate of Airworthiness of the helicopter</span></label>
+    <label class="check-item"><input type="checkbox" id="item12"><span><span class="num">12)</span> Airworthiness Review Certificate ARC (EASA form 15)</span></label>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="admin-footer">
+    <div class="admin-title">— ADMINISTRATIVE INFORMATION – FOR FOCA ONLY —</div>
+    <table>
+      <tr>
+        <td><span class="lbl">Business Object</span> 313.212 and 313.222</td>
+        <td><span class="lbl">Prepared by</span> SBHE / hep</td>
+        <td><span class="lbl">Released by</span> SL SBHE / 01.02.2021</td>
+      </tr>
+      <tr>
+        <td><span class="lbl">Document Owner</span> SBHE</td>
+        <td><span class="lbl">Revised by</span></td>
+        <td><span class="lbl">Distribution</span> Internal / External</td>
+      </tr>
+    </table>
+    <div class="bottom-line">
+      <span>ISS 01 / REV 00 / 01.02.2021&nbsp;&nbsp;&nbsp;BAZL, Helicopter Flight Operations, 3003 Berne / Email: heli@bazl.admin.ch</span>
+      <span>Form 313.210.001.EN</span>
+    </div>
+  </div>
+
+</form>
+
+<script>
+(function () {
+  const FORM_KEY = 'bazl_checkliste_aussenlandung_ausland';
+  const form = document.getElementById('bazlForm');
+  const statusText = document.getElementById('statusText');
+  const progress = document.getElementById('progress');
+  const checkboxes = Array.from(form.querySelectorAll('input[type=checkbox]'));
+  let dirty = false;
+
+  function updateProgress() {
+    const checked = checkboxes.filter(c => c.checked).length;
+    progress.textContent = `Status: ${checked} of ${checkboxes.length} documents marked as available.`;
+  }
+
+  function markDirty() { dirty = true; setStatus('Unsaved changes'); updateProgress(); }
+  form.addEventListener('change', markDirty);
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function collectData() {
+    const data = {};
+    checkboxes.forEach(el => data[el.id] = el.checked);
+    return data;
+  }
+  function applyData(data) {
+    if (!data) return;
+    checkboxes.forEach(el => { if (data[el.id] !== undefined) el.checked = data[el.id]; });
+    updateProgress();
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    localStorage.setItem(FORM_KEY, JSON.stringify(collectData()));
+    dirty = false;
+    setStatus('Saved ' + new Date().toLocaleTimeString('en-GB'));
+  });
+  document.getElementById('loadBtn').addEventListener('click', function () {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (!raw) { setStatus('No saved state found'); return; }
+    applyData(JSON.parse(raw));
+    dirty = false;
+    setStatus('Loaded ' + new Date().toLocaleTimeString('en-GB'));
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    const checked = checkboxes.filter(c => c.checked).length;
+    const subject = encodeURIComponent('Application off-airfield landing permit (foreign-registered helicopter)');
+    const body = encodeURIComponent(
+      'Dear Sir or Madam\n\n' +
+      `I am hereby submitting my application for an off-airfield landing permit. Checklist status: ${checked} of ${checkboxes.length} documents ready.\n\n` +
+      'Please attach all documents/details listed in the checklist as an enclosure or in the body of this e-mail.\n\n' +
+      'Kind regards'
+    );
+    window.location.href = `mailto:heli@bazl.admin.ch?subject=${subject}&body=${body}`;
+  });
+
+  const existing = localStorage.getItem(FORM_KEY);
+  if (existing) { applyData(JSON.parse(existing)); setStatus('Saved state loaded'); }
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>

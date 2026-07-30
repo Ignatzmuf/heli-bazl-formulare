@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Application TFB, LWB, TRB — FOCA</title>
+<style>
+  :root {
+    --ch-red: #FF0000;
+    --ink: #1a1a1a;
+    --line: #7a7a7a;
+    --box-bg: #f2f2f2;
+    --accent-bg: #eef3f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--ink);
+    margin: 0;
+    background: #dedede;
+  }
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #2b2f33;
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 14px;
+  }
+  .toolbar a { color: #fff; text-decoration: none; opacity: .85; }
+  .toolbar a:hover { opacity: 1; }
+  .toolbar button {
+    background: var(--ch-red);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .toolbar button.secondary { background: #545a5f; }
+  .toolbar button:hover { filter: brightness(1.1); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .status { font-size: 12px; opacity: .8; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current { padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit; }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet {
+    max-width: 850px;
+    margin: 24px auto 60px;
+    background: #fff;
+    padding: 40px 48px;
+    box-shadow: 0 0 12px rgba(0,0,0,.25);
+  }
+
+  .header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ch-red);
+    margin-bottom: 20px;
+  }
+  .crest { width: 46px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .header-right {
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .header-right strong { display: block; font-size: 13px; }
+
+  h1.doc-title {
+    font-size: 20px;
+    margin: 4px 0 2px;
+    font-weight: bold;
+  }
+  .subtitle-list {
+    font-size: 13.5px;
+    margin: 4px 0 18px;
+    line-height: 1.5;
+  }
+  .subtitle-list strong { font-weight: bold; }
+
+  .instructions {
+    background: var(--box-bg);
+    border: 1px solid #ccc;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .instructions b { display: block; margin-bottom: 2px; }
+  .instructions a { color: var(--ch-red); }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+    border: 1px solid #999;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .field-row { display: grid; grid-template-columns: 130px 1fr; align-items: center; gap: 8px; }
+  .field-row label { font-size: 13.5px; white-space: nowrap; }
+  .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 3px 2px;
+    font-size: 13.5px;
+    font-family: inherit;
+    width: 100%;
+  }
+  .field-row input:invalid, .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+
+  .section-box {
+    border: 1px solid #999;
+    margin-bottom: 16px;
+  }
+  .section-box .section-title {
+    font-weight: bold;
+    font-size: 14.5px;
+    padding: 10px 14px 6px;
+  }
+  .section-box .legal {
+    font-size: 12px;
+    color: #333;
+    padding: 0 14px;
+    line-height: 1.45;
+  }
+  .section-box .legal u { text-decoration: underline; }
+  .radio-row {
+    display: flex;
+    gap: 40px;
+    padding: 10px 14px 14px;
+    font-size: 13.5px;
+  }
+  .radio-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .radio-row input[type=radio] { width: 15px; height: 15px; accent-color: var(--ch-red); }
+
+  .footer-box {
+    border: 1px solid #999;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 26px;
+  }
+  .footer-box .ort-datum { grid-column: 1 / -1; display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 8px; }
+  .footer-box .ort-datum input { border: none; border-bottom: 1px solid #333; font-size: 13.5px; padding: 3px 2px; font-family: inherit; }
+  .sig-block label { font-size: 13px; display: block; margin-bottom: 4px; }
+  .sig-block .hint { font-size: 11px; color: #555; font-style: italic; }
+  canvas.sig-pad {
+    border: 1px solid #333;
+    width: 100%;
+    height: 90px;
+    background: #fff;
+    touch-action: none;
+    cursor: crosshair;
+  }
+  .sig-actions { margin-top: 4px; }
+  .sig-actions button {
+    font-size: 11px;
+    padding: 3px 8px;
+    border: 1px solid #999;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+
+  .admin-footer {
+    border-top: 1px solid #999;
+    padding-top: 8px;
+    font-size: 9.5px;
+    color: #444;
+  }
+  .admin-footer .admin-title {
+    text-align: center;
+    font-style: italic;
+    letter-spacing: .5px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  .admin-footer table { width: 100%; border-collapse: collapse; }
+  .admin-footer td { padding: 1px 4px; vertical-align: top; }
+  .admin-footer .lbl { color: #777; }
+  .admin-footer .bottom-line { display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 3px; }
+
+  .required::after { content: " *"; color: var(--ch-red); }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none !important; }
+    .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
+    .header, .instructions, .field-grid, .section-box, .footer-box, .admin-footer {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .header { margin-bottom: 10px; padding-bottom: 10px; }
+    .subtitle-list { margin-bottom: 10px; }
+    .instructions { margin-bottom: 10px; padding: 7px 14px; }
+    .field-grid { margin-bottom: 10px; padding: 8px 16px; }
+    .section-box { margin-bottom: 8px; }
+    .section-box .section-title { padding: 6px 14px 4px; }
+    .radio-row { padding: 6px 14px 8px; }
+    .footer-box { padding: 8px 16px; margin-bottom: 8px; gap: 8px; }
+    canvas.sig-pad { height: 65px; }
+    .sig-actions { display: none; }
+    .admin-footer { padding-top: 5px; }
+    @page { size: A4; margin: 9mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../index_en.html">&larr; Overview</a>
+  <nav class="lang-menu" aria-label="Language">
+    <a href="../formulare_de/tfb-lwb-trb.html">DE</a>
+    <a href="../formulare_fr/tfb-lwb-trb.html">FR</a>
+    <a href="../formulare_it/tfb-lwb-trb.html">IT</a>
+    <span class="lang-current">EN</span>
+  </nav>
+  <div class="spacer"></div>
+  <span class="status" id="statusText"></span>
+  <button type="button" class="secondary" id="loadBtn">Load</button>
+  <button type="button" class="secondary" id="saveBtn">Save</button>
+  <button type="button" id="printBtn">Print / Save as PDF</button>
+  <button type="button" class="secondary" id="mailBtn">Send by e-mail</button>
+</div>
+
+<form class="sheet" id="bazlForm" novalidate>
+
+  <div class="header">
+    <div class="header-left">
+      <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+        <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+        <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+      </svg>
+      <div class="country">
+        Schweizerische Eidgenossenschaft<br>
+        Confédération suisse<br>
+        Confederazione Svizzera<br>
+        Confederaziun svizra
+      </div>
+    </div>
+    <div class="header-right">
+      Federal Department of the Environment,<br>
+      Transport, Energy and Communications DETEC
+      <strong>Federal Office of Civil Aviation FOCA</strong>
+      Flight Operations Safety
+    </div>
+  </div>
+
+  <h1 class="doc-title">Application form</h1>
+  <div class="subtitle-list">
+    <strong>For Swiss operators, commercial helicopter flights under EASA Part-SPO</strong><br>
+    &nbsp;&nbsp;1) Flying below minimum heights<br>
+    &nbsp;&nbsp;2) Avalanche blasting<br>
+    <strong>For Swiss rescue organisations or the Swiss police:</strong><br>
+    &nbsp;&nbsp;3) Off-airfield landings above 2000 m/AMSL for training purposes
+  </div>
+
+  <div class="instructions">
+    <b>Instructions:</b>
+    Fill in the form, print, sign, scan and send to: <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a>
+  </div>
+
+  <div class="field-grid">
+    <div class="field-row">
+      <label for="firma" class="required">Company name:</label>
+      <input type="text" id="firma" required>
+    </div>
+    <div class="field-row">
+      <label for="aocNr">AOC No.:</label>
+      <input type="text" id="aocNr">
+    </div>
+    <div class="field-row">
+      <label for="email" class="required">Email address:</label>
+      <input type="email" id="email" required>
+    </div>
+    <div class="field-row">
+      <label for="sproHraNr">SPO.HRA No.:</label>
+      <input type="text" id="sproHraNr">
+    </div>
+    <div class="field-row" style="grid-column: 2 / 3;">
+      <label for="telefon">Phone No.:</label>
+      <input type="tel" id="telefon">
+    </div>
+  </div>
+
+  <div class="section-box">
+    <div class="section-title">1) Low-flying authorisation under SOP &amp; high-risk authorisation</div>
+    <div class="legal">
+      Pursuant to Art. 28 Rules of the Air Ordinance (VRV-L; SR 748.121.11) and SERA 5005(f) of Implementing Regulation (EU) 923/2012<br>
+      Fee pursuant to Art. 38(e) FOCA Fees Ordinance (GebV-BAZL; SR 748.112.11)
+    </div>
+    <div class="radio-row">
+      <label><input type="radio" name="tfb-status" value="Erstes Gesuch"> First application</label>
+      <label><input type="radio" name="tfb-status" value="Erneuerung"> Renewal</label>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <div class="section-title">2) Avalanche-blasting authorisation under SOP &amp; high-risk authorisation</div>
+    <div class="legal">
+      Pursuant to Art. 14 Civil Aviation Act (LFG; SR 748.0), Art. 81 Civil Aviation Ordinance (LFV; SR 748.01), Art. 9 Rules of the Air Ordinance (VRV-L; SR 748.121.11), Art. 16 Air Transport Ordinance (LTrV; SR 748.411)<br>
+      Fee pursuant to Art. 38(c) FOCA Fees Ordinance (GebV-BAZL; SR 748.112.11)
+    </div>
+    <div class="radio-row">
+      <label><input type="radio" name="lwb-status" value="Erstes Gesuch"> First application</label>
+      <label><input type="radio" name="lwb-status" value="Erneuerung"> Renewal</label>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <div class="section-title">3) Training authorisation with landings above 2000 m/AMSL<br>
+      <span style="font-weight:normal; font-size:13px;">only for Swiss rescue organisations or the Swiss police</span>
+    </div>
+    <div class="legal">
+      Pursuant to Art. 36 Ordinance on Off-Airfield Landings (AulaV; SR 748.132.3)<br>
+      No fee pursuant to Art. 38(f)(3) FOCA Fees Ordinance (GebV-BAZL; SR 748.112.11)
+    </div>
+    <div class="radio-row">
+      <label><input type="radio" name="trb-status" value="Erstes Gesuch"> First application</label>
+      <label><input type="radio" name="trb-status" value="Erneuerung"> Renewal</label>
+    </div>
+  </div>
+
+  <div class="footer-box">
+    <div class="ort-datum">
+      <label for="ortDatum" class="required">Place, date:</label>
+      <input type="text" id="ortDatum" required>
+    </div>
+    <div class="sig-block" style="grid-column: 1 / -1;">
+      <label>Signature of the flight operations manager (NPFO): <span class="hint">(digital signature possible)</span></label>
+      <canvas class="sig-pad" id="sigPad" width="700" height="150"></canvas>
+      <div class="sig-actions">
+        <button type="button" id="sigClear">Clear signature</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-footer">
+    <div class="admin-title">— ADMINISTRATIVE INFORMATION – FOR FOCA ONLY —</div>
+    <table>
+      <tr>
+        <td><span class="lbl">Business Object</span> 311.112.001.EN</td>
+        <td><span class="lbl">Prepared by</span> SBHE / hep</td>
+        <td><span class="lbl">Released by</span> SL SBHE 01.03.2021</td>
+      </tr>
+      <tr>
+        <td><span class="lbl">Document Owner</span> SBHE</td>
+        <td><span class="lbl">Revised by</span></td>
+        <td><span class="lbl">Distribution</span> Internal / External</td>
+      </tr>
+    </table>
+    <div class="bottom-line">
+      <span>Gesuch TFB, LWB, TRB - EN&nbsp;&nbsp;&nbsp;BAZL, Helicopter Flight Operations, 3003 Berne / Email: heli@bazl.admin.ch</span>
+      <span>ISS 01 / REV 00 / 01.03.2021</span>
+    </div>
+  </div>
+
+</form>
+
+<script>
+(function () {
+  const FORM_KEY = 'bazl_tfb_lwb_trb';
+  const form = document.getElementById('bazlForm');
+  const statusText = document.getElementById('statusText');
+  let dirty = false;
+
+  // ---------- Signature pad ----------
+  const canvas = document.getElementById('sigPad');
+  const ctx = canvas.getContext('2d');
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#1a1a1a';
+  let drawing = false;
+  let hasSignature = false;
+
+  function pos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+  }
+  function start(e) { drawing = true; hasSignature = true; markDirty(); const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+  function move(e) { if (!drawing) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+  function end() { drawing = false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+
+  document.getElementById('sigClear').addEventListener('click', function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSignature = false;
+    markDirty();
+  });
+
+  // ---------- Dirty tracking ----------
+  function markDirty() { dirty = true; setStatus('Unsaved changes'); }
+  form.addEventListener('input', markDirty);
+  form.addEventListener('change', markDirty);
+
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  // ---------- Serialize / Deserialize ----------
+  function collectData() {
+    const data = {};
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel]').forEach(el => data[el.id] = el.value);
+    form.querySelectorAll('input[type=radio]:checked').forEach(el => data[el.name] = el.value);
+    data.signature = hasSignature ? canvas.toDataURL('image/png') : null;
+    return data;
+  }
+
+  function applyData(data) {
+    if (!data) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel]').forEach(el => {
+      if (data[el.id] !== undefined) el.value = data[el.id];
+    });
+    ['tfb-status', 'lwb-status', 'trb-status'].forEach(name => {
+      if (data[name]) {
+        const radio = form.querySelector(`input[name="${name}"][value="${CSS.escape(data[name])}"]`);
+        if (radio) radio.checked = true;
+      }
+    });
+    if (data.signature) {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); hasSignature = true; };
+      img.src = data.signature;
+    }
+  }
+
+  // ---------- Buttons ----------
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    localStorage.setItem(FORM_KEY, JSON.stringify(collectData()));
+    dirty = false;
+    setStatus('Saved ' + new Date().toLocaleTimeString('en-GB'));
+  });
+
+  document.getElementById('loadBtn').addEventListener('click', function () {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (!raw) { setStatus('No saved state found'); return; }
+    applyData(JSON.parse(raw));
+    dirty = false;
+    setStatus('Loaded ' + new Date().toLocaleTimeString('en-GB'));
+  });
+
+  function validateRequired() {
+    let ok = true;
+    let firstInvalid = null;
+    form.querySelectorAll('[required]').forEach(el => {
+      if (!el.value.trim()) {
+        el.classList.add('invalid');
+        ok = false;
+        if (!firstInvalid) firstInvalid = el;
+      } else {
+        el.classList.remove('invalid');
+      }
+    });
+    if (!ok && firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstInvalid.focus();
+    }
+    return ok;
+  }
+
+  document.getElementById('printBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Please fill in the required fields (*)'); return; }
+    window.print();
+  });
+
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Please fill in the required fields (*)'); return; }
+    const subject = encodeURIComponent('Application TFB/LWB/TRB - ' + (document.getElementById('firma').value || 'Company'));
+    const body = encodeURIComponent(
+      'Dear Sir or Madam\n\n' +
+      'Please find attached the completed TFB/LWB/TRB application form.\n\n' +
+      'Note: please manually attach the PDF generated via "Print / Save as PDF" to this e-mail ' +
+      '(an automatic attachment is not possible from the browser).\n\n' +
+      'Kind regards'
+    );
+    window.location.href = `mailto:heli@bazl.admin.ch?subject=${subject}&body=${body}`;
+  });
+
+  // Auto-load on open if a saved state exists
+  const existing = localStorage.getItem(FORM_KEY);
+  if (existing) { applyData(JSON.parse(existing)); setStatus('Saved state loaded'); }
+})();
+</script>
+
+</body>
+</html>

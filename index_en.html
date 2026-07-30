@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOCA Forms — Helicopter Flight Operations</title>
+<style>
+  :root { --ch-red: #FF0000; --ink: #1a1a1a; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--ink); margin: 0; background: #dedede; }
+
+  .toolbar {
+    position: sticky; top: 0; z-index: 10; background: #2b2f33; color: #fff;
+    padding: 10px 16px; display: flex; gap: 10px; align-items: center; font-size: 14px;
+  }
+  .toolbar .spacer { flex: 1; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current {
+    padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit;
+  }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet { max-width: 950px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+
+  .header {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
+    padding-bottom: 16px; border-bottom: 2px solid var(--ch-red); margin-bottom: 24px;
+  }
+  .crest { width: 50px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country { font-size: 12px; line-height: 1.4; }
+  .header-right { text-align: right; font-size: 13px; line-height: 1.5; }
+  .header-right strong { display: block; font-size: 14px; }
+
+  h1.doc-title { font-size: 24px; margin: 0 0 6px; }
+  .intro { font-size: 14px; color: #333; margin-bottom: 28px; line-height: 1.6; max-width: 700px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    border: 1px solid #999; border-left: 5px solid var(--ch-red);
+    padding: 18px 20px; background: #fafafa; transition: box-shadow .15s, transform .15s;
+  }
+  .card:hover { box-shadow: 0 4px 10px rgba(0,0,0,.15); transform: translateY(-1px); background: #fff; }
+  .card .kicker { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--ch-red); font-weight: bold; margin-bottom: 6px; }
+  .card h2 { font-size: 16px; margin: 0 0 8px; line-height: 1.35; }
+  .card p { font-size: 12.5px; color: #444; margin: 0; line-height: 1.5; }
+
+  .footer-note { margin-top: 34px; font-size: 11.5px; color: #666; border-top: 1px solid #ccc; padding-top: 12px; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="spacer"></div>
+  <nav class="lang-menu" aria-label="Language">
+    <a href="index.html">DE</a>
+    <a href="index_fr.html">FR</a>
+    <a href="index_it.html">IT</a>
+    <span class="lang-current">EN</span>
+  </nav>
+</div>
+
+<div class="sheet">
+
+  <div class="header">
+    <div class="header-left">
+      <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+        <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+        <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+      </svg>
+      <div class="country">
+        Schweizerische Eidgenossenschaft<br>
+        Confédération suisse<br>
+        Confederazione Svizzera<br>
+        Confederaziun svizra
+      </div>
+    </div>
+    <div class="header-right">
+      Federal Department of the Environment,<br>
+      Transport, Energy and Communications DETEC
+      <strong>Federal Office of Civil Aviation FOCA</strong>
+      Flight Operations Safety
+    </div>
+  </div>
+
+  <h1 class="doc-title">Application Forms Helicopter Flight Operations</h1>
+  <div class="intro">
+    Select the required form below. You can fill it in directly in your browser, save the state locally,
+    print/save it as a PDF, and send it by e-mail to <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a>.
+  </div>
+
+  <div class="grid">
+
+    <a class="card" href="formulare_en/tfb-lwb-trb.html">
+      <div class="kicker">Application form</div>
+      <h2>TFB / LWB / TRB</h2>
+      <p>Low-flying authorisation, avalanche-blasting authorisation, and training authorisation with landings above 2000 m/AMSL — for Swiss operators (EASA Part-SPO).</p>
+    </a>
+
+    <a class="card" href="formulare_en/alb-ueber-1100m.html">
+      <div class="kicker">Application form</div>
+      <h2>ALB above 1100m/AMSL</h2>
+      <p>Landings above 1100m/AMSL when transporting persons for tourist or sporting purposes (AOC/CAT only).</p>
+    </a>
+
+    <a class="card" href="formulare_en/alb-restaurant.html">
+      <div class="kicker">Application form</div>
+      <h2>ALB-Restaurant</h2>
+      <p>Landings and take-offs within 100m of a restaurant — for private pilots or aviation companies.</p>
+    </a>
+
+    <a class="card" href="formulare_en/schutzgebiet-arbeitsfluege.html">
+      <div class="kicker">Application form</div>
+      <h2>Landing in protected area</h2>
+      <p>Landing for work purposes in a protected area, incl. opinion of the cantonal authority (2 pages).</p>
+    </a>
+
+    <a class="card" href="formulare_en/checkliste-aussenlandung-ausland.html">
+      <div class="kicker">Checklist</div>
+      <h2>Off-airfield landing permit (foreign-registered helicopter)</h2>
+      <p>Interactive checklist of the documents to submit for a landing with a helicopter registered abroad.</p>
+    </a>
+
+  </div>
+
+  <div class="footer-note">
+    FOCA, Helicopter Flight Operations, 3003 Berne &middot; Email: heli@bazl.admin.ch
+  </div>
+
+</div>
+
+</body>
+</html>

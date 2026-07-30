@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domanda ALB-Restaurant — UFAC</title>
+<style>
+  :root { --ch-red: #FF0000; --ink: #1a1a1a; --box-bg: #f2f2f2; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--ink); margin: 0; background: #dedede; }
+  .toolbar {
+    position: sticky; top: 0; z-index: 10; background: #2b2f33; color: #fff;
+    padding: 10px 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 14px;
+  }
+  .toolbar a { color: #fff; text-decoration: none; opacity: .85; }
+  .toolbar a:hover { opacity: 1; }
+  .toolbar button {
+    background: var(--ch-red); color: #fff; border: none; padding: 8px 14px;
+    border-radius: 3px; cursor: pointer; font-size: 13px; font-family: inherit;
+  }
+  .toolbar button.secondary { background: #545a5f; }
+  .toolbar button:hover { filter: brightness(1.1); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .status { font-size: 12px; opacity: .8; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current { padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit; }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+
+  .header {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
+    padding-bottom: 16px; border-bottom: 2px solid var(--ch-red); margin-bottom: 20px;
+  }
+  .crest { width: 46px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country { font-size: 11px; line-height: 1.4; }
+  .header-right { text-align: right; font-size: 12px; line-height: 1.5; }
+  .header-right strong { display: block; font-size: 13px; }
+
+  h1.doc-title { font-size: 20px; margin: 4px 0 2px; font-weight: bold; }
+  .subtitle { font-size: 15px; margin: 4px 0 14px; font-weight: bold; }
+
+  .legal-box { border: 1px solid #999; padding: 8px 14px; font-size: 12px; margin-bottom: 10px; }
+
+  .instructions { background: var(--box-bg); border: 1px solid #ccc; padding: 10px 14px; font-size: 12.5px; line-height: 1.5; margin-bottom: 18px; }
+  .instructions b { display: block; margin-bottom: 2px; }
+  .instructions a { color: var(--ch-red); }
+
+  .section-box { border: 1px solid #999; margin-bottom: 14px; padding: 12px 16px; }
+  .section-box .section-title { font-weight: bold; font-size: 14.5px; margin-bottom: 10px; }
+  .section-box .section-title .hint { font-weight: normal; font-size: 12px; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+  .field-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 8px; }
+  .field-row label { font-size: 13.5px; }
+  .field-row input[type=text], .field-row input[type=email], .field-row input[type=date] {
+    border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
+  }
+  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .required::after { content: " *"; color: var(--ch-red); }
+
+  .gaststaette-row { border: 1px solid #999; padding: 12px 16px; margin-bottom: 14px; }
+
+  .check-box { border: 1px solid #999; padding: 10px 16px; margin-bottom: 14px; font-size: 13px; }
+  .check-line { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; }
+  .check-line input[type=checkbox] { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ch-red); }
+  .check-line u { text-decoration: underline; }
+
+  .begruendung-box { border: 1px solid #999; padding: 12px 16px; margin-bottom: 14px; }
+  .begruendung-box label { font-size: 13px; display: block; margin-bottom: 6px; }
+  .begruendung-box textarea { width: 100%; min-height: 80px; border: 1px solid #333; font-family: inherit; font-size: 13px; padding: 6px; resize: vertical; }
+
+  .einverstaendnis-box { border: 1px solid #999; padding: 12px 16px; margin-bottom: 14px; }
+  .einverstaendnis-box .title { font-weight: bold; font-size: 14px; margin-bottom: 6px; }
+  .einverstaendnis-box .rules { font-size: 12.5px; line-height: 1.5; margin-bottom: 10px; }
+
+  .sig-field { margin-bottom: 12px; }
+  .sig-field label { font-size: 13px; display: block; margin-bottom: 4px; }
+  .sig-field textarea { width: 100%; min-height: 55px; border: 1px solid #333; font-family: inherit; font-size: 13px; padding: 6px; resize: vertical; }
+
+  .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
+  .admin-footer .admin-title { text-align: center; font-style: italic; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
+  .admin-footer table { width: 100%; border-collapse: collapse; }
+  .admin-footer td { padding: 1px 4px; vertical-align: top; }
+  .admin-footer .lbl { color: #777; }
+  .admin-footer .bottom-line { display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 3px; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none !important; }
+    .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
+    .header, .instructions, .section-box, .gaststaette-row, .check-box,
+    .begruendung-box, .einverstaendnis-box, .admin-footer {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .header { margin-bottom: 5px; padding-bottom: 5px; }
+    .subtitle { margin-bottom: 4px; }
+    .legal-box { padding: 3px 14px; margin-bottom: 4px; }
+    .instructions { padding: 4px 14px; margin-bottom: 4px; line-height: 1.25; }
+    .section-box { padding: 4px 16px; margin-bottom: 4px; }
+    .section-box .section-title { margin-bottom: 3px; }
+    .field-grid { gap: 2px 24px; }
+    .gaststaette-row { padding: 4px 16px; margin-bottom: 4px; }
+    .check-box { padding: 3px 16px; margin-bottom: 4px; }
+    .check-line { padding: 1px 0; }
+    .begruendung-box { padding: 4px 16px; margin-bottom: 4px; }
+    .begruendung-box textarea { min-height: 30px; }
+    .einverstaendnis-box { padding: 4px 16px; margin-bottom: 4px; }
+    .einverstaendnis-box .title { margin-bottom: 2px; }
+    .einverstaendnis-box .rules { margin-bottom: 3px; line-height: 1.25; }
+    .sig-field { margin-bottom: 3px; }
+    .sig-field label { margin-bottom: 2px; }
+    .sig-field textarea { min-height: 22px; }
+    .admin-footer { margin-top: 3px; padding-top: 3px; }
+    @page { size: A4; margin: 7mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../index_it.html">&larr; Panoramica</a>
+  <nav class="lang-menu" aria-label="Lingua">
+    <a href="../formulare_de/alb-restaurant.html">DE</a>
+    <a href="../formulare_fr/alb-restaurant.html">FR</a>
+    <span class="lang-current">IT</span>
+    <a href="../formulare_en/alb-restaurant.html">EN</a>
+  </nav>
+  <div class="spacer"></div>
+  <span class="status" id="statusText"></span>
+  <button type="button" class="secondary" id="loadBtn">Carica</button>
+  <button type="button" class="secondary" id="saveBtn">Salva</button>
+  <button type="button" id="printBtn">Stampa / Salva come PDF</button>
+  <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+</div>
+
+<form class="sheet" id="bazlForm" novalidate>
+
+  <div class="header">
+    <div class="header-left">
+      <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+        <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+        <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+      </svg>
+      <div class="country">
+        Schweizerische Eidgenossenschaft<br>
+        Confédération suisse<br>
+        Confederazione Svizzera<br>
+        Confederaziun svizra
+      </div>
+    </div>
+    <div class="header-right">
+      Dipartimento federale dell'ambiente,<br>
+      dei trasporti, dell'energia e delle comunicazioni DATEC
+      <strong>Ufficio federale dell'aviazione civile UFAC</strong>
+      Sicurezza delle operazioni di volo
+    </div>
+  </div>
+
+  <h1 class="doc-title">Modulo di domanda</h1>
+  <div class="subtitle">Atterraggi e decolli a meno di 100 m da un ristorante</div>
+
+  <div class="legal-box">
+    Base legale: Ordinanza sull'atterraggio esterno (OATC; RS 748.132.3) art. 10, art. 25(d), art. 32(f) e art. 34(e).<br>
+    Tassa secondo il tempo impiegato conformemente all'Ordinanza sulle tasse UFAC (OTa-UFAC; RS 748.112.11) art. 38(1-i).
+  </div>
+
+  <div class="instructions">
+    <b>Istruzioni:</b>
+    Questo modulo può essere utilizzato sia da un pilota privato (1) <b style="display:inline;">sia</b> da un'impresa di trasporto aereo svizzera (2).
+    L'autorizzazione vale unicamente per elicotteri iscritti nel registro aeromobili svizzero. Per ogni ristorante
+    deve essere utilizzato un modulo separato. Più moduli possono essere inoltrati insieme.<br>
+    Compilare il modulo, stampare, far firmare, inviare con allegato a: <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a><br>
+    Il modulo con le firme originali deve essere conservato dal richiedente.
+  </div>
+
+  <div class="section-box">
+    <div class="section-title">1) Voli non commerciali <span class="hint">(da compilare a cura del pilota)</span></div>
+    <div class="field-grid">
+      <div class="field-row"><label for="pilotName">Nome del pilota:</label><input type="text" id="pilotName"></div>
+      <div class="field-row"><label for="lizenzNr">N. licenza:</label><input type="text" id="lizenzNr"></div>
+      <div class="field-row"><label for="pilotEmail">Indirizzo e-mail:</label><input type="email" id="pilotEmail"></div>
+      <div class="field-row"><label for="geburtsdatum">Data di nascita:</label><input type="text" id="geburtsdatum"></div>
+      <div class="field-row" style="grid-column: 2 / 3;"><label for="pilotTelefon">N. telefono:</label><input type="text" id="pilotTelefon"></div>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <div class="section-title">2) Voli commerciali e/o d'istruzione <span class="hint">(da compilare a cura dell'impresa di trasporto aereo)</span></div>
+    <div class="field-grid">
+      <div class="field-row"><label for="firmaName">Nome della ditta:</label><input type="text" id="firmaName"></div>
+      <div class="field-row"><label for="aocNr">N. AOC:</label><input type="text" id="aocNr"></div>
+      <div class="field-row"><label for="firmaEmail">Indirizzo e-mail:</label><input type="email" id="firmaEmail"></div>
+      <div class="field-row"><label for="atoNr">N. ATO:</label><input type="text" id="atoNr"></div>
+    </div>
+  </div>
+
+  <div class="gaststaette-row">
+    <div class="field-row" style="grid-template-columns: 190px 1fr;">
+      <label for="gaststaette" class="required">Ristorante (nome, luogo):</label>
+      <input type="text" id="gaststaette" required>
+    </div>
+  </div>
+
+  <div class="check-box">
+    <div class="check-line">
+      <input type="checkbox" id="confirmKarte">
+      <label for="confirmKarte">Deve essere allegata una carta con la piazzola di atterraggio.</label>
+    </div>
+    <div class="check-line">
+      <input type="checkbox" id="confirmLage">
+      <label for="confirmLage">Cliccare qui per confermare che la piazzola di atterraggio si trova sotto i 1100 metri e non è situata <u>NÉ</u> in
+      una zona residenziale <u>NÉ</u> in una zona protetta (art. 19 e art. 32h OATC).</label>
+    </div>
+  </div>
+
+  <div class="begruendung-box">
+    <label for="begruendung"><b>Motivazione:</b> Perché è necessario un atterraggio a meno di 100 m?</label>
+    <textarea id="begruendung"></textarea>
+  </div>
+
+  <div class="einverstaendnis-box">
+    <div class="title">Consenso del proprietario del terreno e del gestore del ristorante:</div>
+    <div class="rules">
+      1) Per un massimo di 2 atterraggi al mese per il pilota privato sopra indicato <b>oppure</b><br>
+      2) Per un numero illimitato di atterraggi per la ditta sopra indicata.<br>
+      <b>Nota</b>: la responsabilità per un atterraggio sicuro spetta sempre al pilota.
+    </div>
+    <div class="sig-field">
+      <label for="sigGrundeigentuemer">Luogo, data e firma del proprietario del terreno:</label>
+      <textarea id="sigGrundeigentuemer"></textarea>
+    </div>
+    <div class="sig-field">
+      <label for="sigGaststaettenbetreiber">Luogo, data e firma del gestore del ristorante:</label>
+      <textarea id="sigGaststaettenbetreiber"></textarea>
+    </div>
+  </div>
+
+  <div class="admin-footer">
+    <div class="admin-title">— ADMINISTRATIVE INFORMATION – FOR FOCA ONLY —</div>
+    <table>
+      <tr>
+        <td><span class="lbl">Business Object</span> 311.122.001 IT</td>
+        <td><span class="lbl">Prepared by</span> SBHE / hep</td>
+        <td><span class="lbl">Released by</span> SL SBHE / 21.03.2022</td>
+      </tr>
+      <tr>
+        <td><span class="lbl">Document Owner</span> SBHE</td>
+        <td><span class="lbl">Revised by</span></td>
+        <td><span class="lbl">Distribution</span> Internal / External</td>
+      </tr>
+    </table>
+    <div class="bottom-line">
+      <span>Gesuch ALB-Restaurant - IT&nbsp;&nbsp;&nbsp;BAZL, Helicopter Flight Operations, 3003 Berne / Email: heli@bazl.admin.ch</span>
+      <span>ISS 01 / REV 01 / 21.03.2022</span>
+    </div>
+  </div>
+
+</form>
+
+<script>
+(function () {
+  const FORM_KEY = 'bazl_alb_restaurant';
+  const form = document.getElementById('bazlForm');
+  const statusText = document.getElementById('statusText');
+  let dirty = false;
+
+  function markDirty() { dirty = true; setStatus('Modifiche non salvate'); }
+  form.addEventListener('input', markDirty);
+  form.addEventListener('change', markDirty);
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function collectData() {
+    const data = {};
+    form.querySelectorAll('input[type=text], input[type=email], textarea').forEach(el => data[el.id] = el.value);
+    form.querySelectorAll('input[type=checkbox]').forEach(el => data[el.id] = el.checked);
+    return data;
+  }
+  function applyData(data) {
+    if (!data) return;
+    form.querySelectorAll('input[type=text], input[type=email], textarea').forEach(el => {
+      if (data[el.id] !== undefined) el.value = data[el.id];
+    });
+    form.querySelectorAll('input[type=checkbox]').forEach(el => {
+      if (data[el.id] !== undefined) el.checked = data[el.id];
+    });
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    localStorage.setItem(FORM_KEY, JSON.stringify(collectData()));
+    dirty = false;
+    setStatus('Salvato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+  document.getElementById('loadBtn').addEventListener('click', function () {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (!raw) { setStatus('Nessuno stato salvato trovato'); return; }
+    applyData(JSON.parse(raw));
+    dirty = false;
+    setStatus('Caricato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+
+  function validateRequired() {
+    let ok = true; let firstInvalid = null;
+    form.querySelectorAll('[required]').forEach(el => {
+      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; if (!firstInvalid) firstInvalid = el; }
+      else { el.classList.remove('invalid'); }
+    });
+    if (!ok && firstInvalid) { firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstInvalid.focus(); }
+    return ok;
+  }
+
+  document.getElementById('printBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Si prega di compilare i campi obbligatori (*)'); return; }
+    window.print();
+  });
+
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Si prega di compilare i campi obbligatori (*)'); return; }
+    const subject = encodeURIComponent('Domanda ALB-Restaurant - ' + (document.getElementById('gaststaette').value || 'Ristorante'));
+    const body = encodeURIComponent(
+      'Gentili Signore, Gentili Signori\n\n' +
+      'In allegato il modulo di domanda compilato per atterraggi/decolli a meno di 100 m da un ristorante.\n\n' +
+      'Nota: si prega di allegare manualmente a questa e-mail il PDF firmato generato tramite "Stampa / Salva come PDF" ' +
+      'insieme agli allegati (un allegato automatico non è possibile dal browser).\n\n' +
+      'Cordiali saluti'
+    );
+    window.location.href = `mailto:heli@bazl.admin.ch?subject=${subject}&body=${body}`;
+  });
+
+  const existing = localStorage.getItem(FORM_KEY);
+  if (existing) { applyData(JSON.parse(existing)); setStatus('Stato salvato caricato'); }
+})();
+</script>
+
+</body>
+</html>

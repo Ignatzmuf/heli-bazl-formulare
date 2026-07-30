@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domanda atterraggio in zona protetta — UFAC</title>
+<style>
+  :root { --ch-red: #FF0000; --ink: #1a1a1a; --box-bg: #f2f2f2; --auth-bg: #f6efe3; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--ink); margin: 0; background: #dedede; }
+  .toolbar {
+    position: sticky; top: 0; z-index: 10; background: #2b2f33; color: #fff;
+    padding: 10px 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 14px;
+  }
+  .toolbar a { color: #fff; text-decoration: none; opacity: .85; }
+  .toolbar a:hover { opacity: 1; }
+  .toolbar button {
+    background: var(--ch-red); color: #fff; border: none; padding: 8px 14px;
+    border-radius: 3px; cursor: pointer; font-size: 13px; font-family: inherit;
+  }
+  .toolbar button.secondary { background: #545a5f; }
+  .toolbar button:hover { filter: brightness(1.1); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .status { font-size: 12px; opacity: .8; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current { padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit; }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+  .page + .page { margin-top: 30px; padding-top: 30px; border-top: 3px dashed #ccc; }
+
+  .header {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
+    padding-bottom: 16px; border-bottom: 2px solid var(--ch-red); margin-bottom: 20px;
+  }
+  .crest { width: 46px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country { font-size: 11px; line-height: 1.4; }
+  .header-right { text-align: right; font-size: 12px; line-height: 1.5; }
+  .header-right strong { display: block; font-size: 13px; }
+
+  h1.doc-title { font-size: 16px; margin: 4px 0 2px; font-weight: normal; }
+  .subtitle { font-size: 17px; margin: 4px 0 14px; font-weight: bold; line-height: 1.35; }
+
+  .legal-box { border: 1px solid #999; padding: 8px 14px; font-size: 12px; margin-bottom: 10px; word-break: break-word; }
+  .legal-box a { color: var(--ch-red); }
+
+  .instructions { background: var(--box-bg); border: 1px solid #ccc; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; }
+  .instructions b { display: block; margin-bottom: 2px; }
+  .instructions a { color: var(--ch-red); }
+
+  .section-box { border: 1px solid #999; margin-bottom: 14px; padding: 12px 16px; }
+  .section-box .section-title { font-weight: bold; font-size: 15px; margin-bottom: 10px; }
+
+  .field-row { display: grid; grid-template-columns: 200px 1fr; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .field-row label { font-size: 13.5px; }
+  .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
+    border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
+  }
+  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .required::after { content: " *"; color: var(--ch-red); }
+
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+
+  .check-line { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 13px; }
+  .check-line input[type=checkbox] { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ch-red); }
+
+  .body-text { font-size: 12.5px; line-height: 1.5; margin: 10px 0; }
+
+  textarea { width: 100%; border: 1px solid #333; font-family: inherit; font-size: 13px; padding: 6px; resize: vertical; }
+  textarea.tall { min-height: 100px; }
+  textarea.medium { min-height: 60px; }
+
+  .sig-row { display: grid; grid-template-columns: 220px 1fr; align-items: center; gap: 8px; margin-top: 10px; }
+  .sig-row label { font-size: 13px; }
+  .sig-row input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 3px 2px; width: 100%; }
+
+  .page-footer { font-size: 11px; color: #555; text-align: right; margin-top: 10px; font-style: italic; }
+
+  .authority-section {
+    border: 2px solid var(--ch-red);
+    background: var(--auth-bg);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+  }
+  .authority-section .badge {
+    display: inline-block;
+    background: var(--ch-red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    letter-spacing: .5px;
+  }
+  .authority-section .section-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
+  .question-block { margin-bottom: 14px; }
+  .question-block .q { font-size: 13.5px; margin-bottom: 6px; }
+  .radio-inline { display: flex; gap: 26px; margin-bottom: 6px; font-size: 13px; }
+  .radio-inline label { display: flex; align-items: center; gap: 5px; }
+  .radio-inline input[type=radio] { width: 15px; height: 15px; accent-color: var(--ch-red); }
+
+  .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
+  .admin-footer .bottom-line { display: flex; justify-content: space-between; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none !important; }
+    .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
+    .header, .legal-box, .instructions, .section-box, .question-block, .admin-footer {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .page { page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+    .page + .page { margin-top: 0; padding-top: 0; border-top: none; }
+    .header { margin-bottom: 6px; padding-bottom: 6px; }
+    .subtitle { margin-bottom: 5px; }
+    .legal-box { padding: 4px 14px; margin-bottom: 5px; }
+    .instructions { padding: 5px 14px; margin-bottom: 6px; }
+    .section-box { padding: 6px 16px; margin-bottom: 6px; }
+    .section-box .section-title { margin-bottom: 4px; }
+    .field-row { margin-bottom: 3px; }
+    .field-grid-2 { gap: 3px 24px; }
+    .check-line { padding: 2px 0; }
+    .body-text { margin: 4px 0; line-height: 1.3; }
+    textarea.tall { min-height: 46px; }
+    textarea.medium { min-height: 26px; }
+    .sig-row { margin-top: 5px; }
+    .page-footer { margin-top: 4px; }
+    .authority-section { padding: 6px 16px; margin-bottom: 6px; }
+    .authority-section .badge { margin-bottom: 5px; }
+    .authority-section .section-title { margin-bottom: 4px; }
+    .question-block { margin-bottom: 5px; }
+    .question-block .q { margin-bottom: 2px; }
+    .radio-inline { margin-bottom: 2px; }
+    .admin-footer { margin-top: 4px; padding-top: 4px; }
+    @page { size: A4; margin: 8mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../index_it.html">&larr; Panoramica</a>
+  <nav class="lang-menu" aria-label="Lingua">
+    <a href="../formulare_de/schutzgebiet-arbeitsfluege.html">DE</a>
+    <a href="../formulare_fr/schutzgebiet-arbeitsfluege.html">FR</a>
+    <span class="lang-current">IT</span>
+    <a href="../formulare_en/schutzgebiet-arbeitsfluege.html">EN</a>
+  </nav>
+  <div class="spacer"></div>
+  <span class="status" id="statusText"></span>
+  <button type="button" class="secondary" id="loadBtn">Carica</button>
+  <button type="button" class="secondary" id="saveBtn">Salva</button>
+  <button type="button" id="printBtn">Stampa / Salva come PDF</button>
+  <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+</div>
+
+<form class="sheet" id="bazlForm" novalidate>
+
+  <!-- ===================== PAGINA 1 ===================== -->
+  <div class="page" id="page1">
+    <div class="header">
+      <div class="header-left">
+        <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+          <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+          <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+        </svg>
+        <div class="country">
+          Schweizerische Eidgenossenschaft<br>
+          Confédération suisse<br>
+          Confederazione Svizzera<br>
+          Confederaziun svizra<br>
+          Swiss Confederation
+        </div>
+      </div>
+      <div class="header-right">
+        Dipartimento federale dell'ambiente, dei trasporti, dell'energia<br>
+        e delle comunicazioni DATEC
+        <strong>Ufficio federale dell'aviazione civile UFAC</strong>
+        Divisione sicurezza delle operazioni di volo
+      </div>
+    </div>
+
+    <h1 class="doc-title">Modulo di domanda</h1>
+    <div class="subtitle">
+      Per imprese di trasporto commerciale con elicottero<br>
+      Atterraggio a scopo di lavoro in una zona protetta
+    </div>
+
+    <div class="legal-box">
+      Autorizzazione secondo gli art. 19 e 28 dell'Ordinanza sull'atterraggio esterno (OATC; RS 748.132.3)<br>
+      <a href="https://www.admin.ch/opc/it/classified-compilation/20100182/index.html" target="_blank" rel="noopener">https://www.admin.ch/opc/it/classified-compilation/20100182/index.html</a><br>
+      Tassa secondo l'art. 38 lett. h numero 3 OTa-UFAC (RS 748.112.11) in base al tempo impiegato, tra CHF 100.- e 50'000.-
+    </div>
+
+    <div class="instructions">
+      <b>Procedura:</b>
+      Il modulo di domanda motivato e compilato integralmente deve essere inoltrato almeno 10 giorni lavorativi prima
+      dell'operazione al seguente indirizzo: <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a>
+    </div>
+
+    <div class="section-box">
+      <div class="section-title">1. Nome della zona protetta:</div>
+      <div class="field-row">
+        <label for="schutzgebietName" class="required">Nome della zona protetta:</label>
+        <input type="text" id="schutzgebietName" required>
+      </div>
+      <div class="field-row">
+        <label for="landungDatum1">Data dell'/degli atterraggio/i:</label>
+        <input type="text" id="landungDatum1">
+      </div>
+    </div>
+
+    <div class="section-box">
+      <div class="section-title">2. Impresa di trasporto con elicottero:</div>
+      <div class="field-grid-2">
+        <div class="field-row"><label for="firmaName" class="required">Nome della ditta:</label><input type="text" id="firmaName" required></div>
+        <div class="field-row"><label for="aocNr">N. AOC:</label><input type="text" id="aocNr"></div>
+        <div class="field-row"><label for="email" class="required">Indirizzo e-mail:</label><input type="email" id="email" required></div>
+        <div class="field-row"><label for="sproHraNr">N. SPO.HRA:</label><input type="text" id="sproHraNr"></div>
+        <div class="field-row" style="grid-column: 2 / 3;"><label for="telefon">N. telefono:</label><input type="tel" id="telefon"></div>
+      </div>
+
+      <div class="check-line">
+        <input type="checkbox" id="confirmKarte">
+        <label for="confirmKarte">Sarà allegata una carta con la piazzola di atterraggio e le rotte di volo.</label>
+      </div>
+
+      <div class="body-text">
+        Un'autorizzazione viene rilasciata solo se l'interesse per il trasporto aereo prevale su quello della zona
+        protetta, in particolare se non è possibile raggiungere il luogo con altri mezzi (ad es. camion) in modo
+        meno dannoso, a costi ragionevoli e entro termini adeguati (art. 28 cpv. 1 OATC).
+      </div>
+
+      <label for="begruendungTransport" style="font-size:13px; display:block; margin-bottom:6px;">
+        Motivare qui perché questo trasporto con atterraggio/i nella zona protetta è necessario:
+      </label>
+      <textarea id="begruendungTransport" class="tall"></textarea>
+
+      <div class="sig-row">
+        <label for="sigNpfo">Data e firma del responsabile delle operazioni di volo (NPFO):</label>
+        <input type="text" id="sigNpfo">
+      </div>
+    </div>
+
+    <div class="section-box">
+      <div class="section-title">3. Committente:</div>
+      <div class="field-row"><label for="auftraggeberName">Nome, indirizzo:</label><input type="text" id="auftraggeberName"></div>
+      <div class="field-grid-2">
+        <div class="field-row"><label for="auftraggeberEmail">Indirizzo e-mail:</label><input type="email" id="auftraggeberEmail"></div>
+        <div class="field-row"><label for="auftraggeberTelefon">N. telefono:</label><input type="tel" id="auftraggeberTelefon"></div>
+      </div>
+      <div class="field-row"><label for="zweckTransport">Scopo del trasporto aereo:</label><input type="text" id="zweckTransport"></div>
+    </div>
+
+    <div class="page-footer">Pagina 1 di 2</div>
+  </div>
+
+  <!-- ===================== PAGINA 2 ===================== -->
+  <div class="page" id="page2">
+    <div class="header">
+      <div class="header-left">
+        <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+          <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+          <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+        </svg>
+        <div class="country">
+          Schweizerische Eidgenossenschaft<br>
+          Confédération suisse<br>
+          Confederazione Svizzera<br>
+          Confederaziun svizra<br>
+          Swiss Confederation
+        </div>
+      </div>
+      <div class="header-right">
+        Dipartimento federale dell'ambiente, dei trasporti, dell'energia<br>
+        e delle comunicazioni DATEC
+        <strong>Ufficio federale dell'aviazione civile UFAC</strong>
+        Divisione sicurezza delle operazioni di volo
+      </div>
+    </div>
+
+    <h1 class="doc-title">Modulo di domanda</h1>
+    <div class="subtitle">
+      Per imprese di trasporto commerciale con elicottero<br>
+      Atterraggio a scopo di lavoro in una zona protetta
+    </div>
+
+    <div class="legal-box">
+      Autorizzazione secondo gli art. 19 e 28 dell'Ordinanza sull'atterraggio esterno (OATC; RS 748.132.3)<br>
+      <a href="https://www.admin.ch/opc/it/classified-compilation/20100182/index.html" target="_blank" rel="noopener">https://www.admin.ch/opc/it/classified-compilation/20100182/index.html</a><br>
+      Tassa secondo l'art. 38 lett. h numero 3 OTa-UFAC (RS 748.112.11) in base al tempo impiegato, tra CHF 100.- e 50'000.-
+    </div>
+
+    <div class="field-row"><label for="schutzgebietName2">Nome della zona protetta:</label><input type="text" id="schutzgebietName2"></div>
+    <div class="field-row"><label for="landungDatum2">Data dell'/degli atterraggio/i:</label><input type="text" id="landungDatum2"></div>
+
+    <div class="authority-section">
+      <span class="badge">SOLO PER L'AUTORITÀ CANTONALE</span>
+      <div class="section-title">4. Parere dell'autorità cantonale competente (art. 28 cpv. 2 OATC)</div>
+
+      <div class="field-row"><label for="behoerdeName">Nome dell'autorità:</label><input type="text" id="behoerdeName"></div>
+
+      <div class="body-text">
+        Un'autorizzazione viene rilasciata solo se l'interesse per il trasporto aereo prevale su quello della zona
+        protetta. I servizi cantonali specializzati esaminano se e come l'obiettivo di protezione sarebbe
+        compromesso da questo/i atterraggio/i, oppure se con determinate restrizioni (orarie o di altro tipo) si
+        possa comunque atterrare.
+      </div>
+
+      <div class="field-row"><label for="schutzzieleBetroffen">Quali obiettivi di protezione sono interessati:</label><input type="text" id="schutzzieleBetroffen"></div>
+
+      <div class="question-block">
+        <div class="q">Si verifica una violazione?</div>
+        <div class="radio-inline">
+          <label><input type="radio" name="verletzung" value="Ja"> Sì</label>
+          <label><input type="radio" name="verletzung" value="Nein"> No</label>
+        </div>
+        <label style="font-size:12px;" for="verletzungBegruendung">Motivazione:</label>
+        <textarea id="verletzungBegruendung" class="medium"></textarea>
+      </div>
+
+      <div class="question-block">
+        <div class="q">Vi sono interessi preponderanti contrari all'/agli atterraggio/i con elicottero?</div>
+        <div class="radio-inline">
+          <label><input type="radio" name="interessen" value="Ja"> Sì</label>
+          <label><input type="radio" name="interessen" value="Nein"> No</label>
+        </div>
+        <label style="font-size:12px;" for="interessenWelche">Se sì, quali:</label>
+        <textarea id="interessenWelche" class="medium"></textarea>
+      </div>
+
+      <div class="question-block">
+        <div class="q">L'/Gli atterraggio/i con elicottero devono essere vincolati a condizioni particolari?</div>
+        <div class="radio-inline">
+          <label><input type="radio" name="sonderbedingungen" value="Ja"> Sì</label>
+          <label><input type="radio" name="sonderbedingungen" value="Nein"> No</label>
+        </div>
+        <label style="font-size:12px;" for="sonderbedingungenBegruendung">Condizione/i e motivazione:</label>
+        <textarea id="sonderbedingungenBegruendung" class="medium"></textarea>
+      </div>
+
+      <label style="font-size:13px; display:block; margin-bottom:6px;" for="bemerkungen">Osservazioni:</label>
+      <textarea id="bemerkungen" class="medium"></textarea>
+
+      <div class="sig-row">
+        <label for="sigBehoerde">Data, nome, timbro/firma:</label>
+        <input type="text" id="sigBehoerde">
+      </div>
+    </div>
+
+    <div class="page-footer">Pagina 2 di 2</div>
+
+    <div class="admin-footer">
+      <div class="bottom-line">
+        <span>BAZL, SBHE, CH-3003 Berna - telefono +41 58 464 6293 - e-mail: heli@bazl.admin.ch</span>
+        <span>Form 311.122.005_AL Schutzgebiet_i_MAI2017</span>
+      </div>
+    </div>
+  </div>
+
+</form>
+
+<script>
+(function () {
+  const FORM_KEY = 'bazl_schutzgebiet_arbeitsfluege';
+  const form = document.getElementById('bazlForm');
+  const statusText = document.getElementById('statusText');
+  let dirty = false;
+
+  function markDirty() { dirty = true; setStatus('Modifiche non salvate'); }
+  form.addEventListener('input', markDirty);
+  form.addEventListener('change', markDirty);
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function collectData() {
+    const data = {};
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => data[el.id] = el.value);
+    form.querySelectorAll('input[type=checkbox]').forEach(el => data[el.id] = el.checked);
+    form.querySelectorAll('input[type=radio]:checked').forEach(el => data[el.name] = el.value);
+    return data;
+  }
+  function applyData(data) {
+    if (!data) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => {
+      if (data[el.id] !== undefined) el.value = data[el.id];
+    });
+    form.querySelectorAll('input[type=checkbox]').forEach(el => {
+      if (data[el.id] !== undefined) el.checked = data[el.id];
+    });
+    ['verletzung', 'interessen', 'sonderbedingungen'].forEach(name => {
+      if (data[name]) {
+        const radio = form.querySelector(`input[name="${name}"][value="${CSS.escape(data[name])}"]`);
+        if (radio) radio.checked = true;
+      }
+    });
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    localStorage.setItem(FORM_KEY, JSON.stringify(collectData()));
+    dirty = false;
+    setStatus('Salvato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+  document.getElementById('loadBtn').addEventListener('click', function () {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (!raw) { setStatus('Nessuno stato salvato trovato'); return; }
+    applyData(JSON.parse(raw));
+    dirty = false;
+    setStatus('Caricato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+
+  function validateRequired() {
+    let ok = true; let firstInvalid = null;
+    form.querySelectorAll('[required]').forEach(el => {
+      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; if (!firstInvalid) firstInvalid = el; }
+      else { el.classList.remove('invalid'); }
+    });
+    if (!ok && firstInvalid) { firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstInvalid.focus(); }
+    return ok;
+  }
+
+  document.getElementById('printBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Si prega di compilare i campi obbligatori (*)'); return; }
+    window.print();
+  });
+
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Si prega di compilare i campi obbligatori (*)'); return; }
+    const subject = encodeURIComponent('Domanda atterraggio in zona protetta - ' + (document.getElementById('firmaName').value || 'Ditta'));
+    const body = encodeURIComponent(
+      'Gentili Signore, Gentili Signori\n\n' +
+      'In allegato il modulo di domanda compilato per un atterraggio a scopo di lavoro in una zona protetta.\n\n' +
+      'Nota: si prega di allegare manualmente a questa e-mail il PDF generato tramite "Stampa / Salva come PDF" ' +
+      'insieme alla carta (piazzola di atterraggio/rotte di volo) (un allegato automatico non è possibile dal browser).\n\n' +
+      'Cordiali saluti'
+    );
+    window.location.href = `mailto:heli@bazl.admin.ch?subject=${subject}&body=${body}`;
+  });
+
+  const existing = localStorage.getItem(FORM_KEY);
+  if (existing) { applyData(JSON.parse(existing)); setStatus('Stato salvato caricato'); }
+})();
+</script>
+
+</body>
+</html>

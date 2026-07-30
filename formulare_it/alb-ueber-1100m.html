@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domanda ALB sopra 1100m — UFAC</title>
+<style>
+  :root {
+    --ch-red: #FF0000;
+    --ink: #1a1a1a;
+    --box-bg: #f2f2f2;
+    --accent-bg: #eef4ec;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--ink); margin: 0; background: #dedede; }
+  .toolbar {
+    position: sticky; top: 0; z-index: 10; background: #2b2f33; color: #fff;
+    padding: 10px 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 14px;
+  }
+  .toolbar a { color: #fff; text-decoration: none; opacity: .85; }
+  .toolbar a:hover { opacity: 1; }
+  .toolbar button {
+    background: var(--ch-red); color: #fff; border: none; padding: 8px 14px;
+    border-radius: 3px; cursor: pointer; font-size: 13px; font-family: inherit;
+  }
+  .toolbar button.secondary { background: #545a5f; }
+  .toolbar button:hover { filter: brightness(1.1); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .status { font-size: 12px; opacity: .8; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current { padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit; }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+
+  .header {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
+    padding-bottom: 16px; border-bottom: 2px solid var(--ch-red); margin-bottom: 20px;
+  }
+  .crest { width: 46px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country { font-size: 11px; line-height: 1.4; }
+  .header-right { text-align: right; font-size: 12px; line-height: 1.5; }
+  .header-right strong { display: block; font-size: 13px; }
+
+  h1.doc-title { font-size: 20px; margin: 4px 0 2px; font-weight: bold; }
+  .subtitle { font-size: 13.5px; margin: 4px 0 14px; line-height: 1.45; font-weight: bold; }
+
+  .legal-box { border: 1px solid #999; padding: 8px 14px; font-size: 12px; margin-bottom: 10px; }
+
+  .instructions { background: var(--box-bg); border: 1px solid #ccc; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; }
+  .instructions b { display: block; margin-bottom: 2px; }
+  .instructions a { color: var(--ch-red); }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; border: 1px solid #999; padding: 14px 16px; margin-bottom: 4px; }
+  .field-grid.no-border { border: none; padding: 0; margin-bottom: 0; }
+  .field-row { display: grid; grid-template-columns: 170px 1fr; align-items: center; gap: 8px; }
+  .field-row label { font-size: 13.5px; }
+  .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
+    border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
+  }
+  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .required::after { content: " *"; color: var(--ch-red); }
+
+  .reasons-box { border: 1px solid #999; border-top: none; padding: 12px 16px; margin-bottom: 4px; font-size: 13.5px; }
+  .reasons-box .intro { margin-bottom: 8px; }
+  .reason-line { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .reason-line .letter { font-weight: bold; }
+  .reason-line label { display: inline-flex; align-items: center; gap: 5px; margin-right: 14px; }
+  .reason-line input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--ch-red); }
+
+  .check-box { border: 1px solid #999; border-top: none; padding: 10px 16px; font-size: 13px; }
+  .check-line { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; }
+  .check-line input[type=checkbox] { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ch-red); }
+
+  .flugdaten { background: var(--accent-bg); border: 1px solid #999; border-top: none; padding: 12px 16px; margin-bottom: 18px; }
+  .flugdaten h3 { margin: 0 0 6px; font-size: 14px; }
+  .flugdaten-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+  .flugdaten textarea {
+    width: 100%; min-height: 60px; border: 1px solid #333; font-family: inherit; font-size: 13px; padding: 6px; resize: vertical;
+  }
+  .sig-mini { display: grid; grid-template-columns: 110px 1fr; gap: 6px; align-items: center; margin-top: 6px; }
+  .sig-mini label { font-size: 13px; }
+  .sig-mini input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 2px; width: 100%; }
+
+  .approval-box { border: 1px solid #999; padding: 10px 16px; margin-bottom: 10px; }
+  .approval-box .title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .approval-box .title-row .title-text { font-weight: bold; font-size: 14px; }
+  .approval-box .title-row .hint { font-weight: normal; font-size: 12px; }
+  .approval-box .title-row .name-label { font-size: 13px; white-space: nowrap; }
+  .approval-box .title-row .name-input { flex: 1; min-width: 120px; border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 2px; }
+  .approval-row { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .approval-row label { font-size: 13px; }
+  .approval-row input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 2px; width: 100%; }
+  .approval-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+  .approval-pair-item { display: grid; align-items: center; gap: 6px; }
+  .approval-pair-item.datum { grid-template-columns: 55px 1fr; }
+  .approval-pair-item.sig { grid-template-columns: 90px 1fr; }
+  .approval-pair-item label { font-size: 13px; }
+  .approval-pair-item input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 2px; width: 100%; }
+
+  .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
+  .admin-footer .admin-title { text-align: center; font-style: italic; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
+  .admin-footer table { width: 100%; border-collapse: collapse; }
+  .admin-footer td { padding: 1px 4px; vertical-align: top; }
+  .admin-footer .lbl { color: #777; }
+  .admin-footer .bottom-line { display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 3px; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none !important; }
+    .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
+    .header, .legal-box, .instructions, .field-grid, .reasons-box, .check-box,
+    .flugdaten, .approval-box, .admin-footer {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .header { margin-bottom: 6px; padding-bottom: 6px; }
+    .subtitle { margin-bottom: 4px; }
+    .legal-box { padding: 4px 14px; margin-bottom: 4px; }
+    .instructions { padding: 5px 14px; margin-bottom: 4px; }
+    .field-grid { padding: 5px 16px; margin-bottom: 0; gap: 4px 20px; }
+    .reasons-box { padding: 5px 16px; }
+    .reason-line { margin-bottom: 1px; }
+    .check-box { padding: 3px 16px; }
+    .check-line { padding: 1px 0; }
+    .flugdaten { padding: 5px 16px; margin-bottom: 4px; }
+    .flugdaten textarea { min-height: 22px; }
+    .approval-box { padding: 3px 12px; margin-bottom: 2px; }
+    .approval-box .title-row { margin-bottom: 2px; }
+    .approval-row { margin-bottom: 1px; }
+    .admin-footer { margin-top: 3px; padding-top: 3px; }
+    @page { size: A4; margin: 7mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../index_it.html">&larr; Panoramica</a>
+  <nav class="lang-menu" aria-label="Lingua">
+    <a href="../formulare_de/alb-ueber-1100m.html">DE</a>
+    <a href="../formulare_fr/alb-ueber-1100m.html">FR</a>
+    <span class="lang-current">IT</span>
+    <a href="../formulare_en/alb-ueber-1100m.html">EN</a>
+  </nav>
+  <div class="spacer"></div>
+  <span class="status" id="statusText"></span>
+  <button type="button" class="secondary" id="loadBtn">Carica</button>
+  <button type="button" class="secondary" id="saveBtn">Salva</button>
+  <button type="button" id="printBtn">Stampa / Salva come PDF</button>
+  <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+</div>
+
+<form class="sheet" id="bazlForm" novalidate>
+
+  <div class="header">
+    <div class="header-left">
+      <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+        <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+        <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+      </svg>
+      <div class="country">
+        Schweizerische Eidgenossenschaft<br>
+        Confédération suisse<br>
+        Confederazione Svizzera<br>
+        Confederaziun svizra
+      </div>
+    </div>
+    <div class="header-right">
+      Dipartimento federale dell'ambiente,<br>
+      dei trasporti, dell'energia e delle comunicazioni DATEC
+      <strong>Ufficio federale dell'aviazione civile UFAC</strong>
+      Sicurezza delle operazioni di volo
+    </div>
+  </div>
+
+  <h1 class="doc-title">Modulo di domanda</h1>
+  <div class="subtitle">
+    Atterraggi sopra 1100 m/M durante il trasporto di persone a scopo<br>
+    turistico o sportivo (solo per AOC/CAT)
+  </div>
+
+  <div class="legal-box">
+    Base legale: Ordinanza sull'atterraggio esterno (OATC; RS 748.132.3) art. 26<br>
+    Tassa CHF 180.- secondo l'Ordinanza sulle tasse UFAC (OTa-UFAC; RS 748.112.11) art. 38(1-g)
+  </div>
+
+  <div class="instructions">
+    <b>Procedura:</b>
+    Per ogni piazzola di atterraggio deve essere compilato un modulo separato.<br>
+    La domanda completa deve essere inoltrata dall'operatore almeno 3 settimane prima del primo volo.<br>
+    Si prega di compilare il modulo, stampare, ottenere i consensi necessari e inviare a: <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a>
+  </div>
+
+  <div class="field-grid">
+    <div class="field-row">
+      <label for="betrieb" class="required">Impresa di elicotteri:</label>
+      <input type="text" id="betrieb" required>
+    </div>
+    <div class="field-row">
+      <label for="aocNr">N. CH-AOC:</label>
+      <input type="text" id="aocNr">
+    </div>
+    <div class="field-row">
+      <label for="email" class="required">Indirizzo e-mail:</label>
+      <input type="email" id="email" required>
+    </div>
+    <div class="field-row">
+      <label for="telefon">Telefono:</label>
+      <input type="tel" id="telefon">
+    </div>
+    <div class="field-row">
+      <label for="landeplatz" class="required">Piazzola di atterraggio (denominazione):</label>
+      <input type="text" id="landeplatz" required>
+    </div>
+    <div class="field-row">
+      <label for="hoehe">Altitudine (m s.l.m.):</label>
+      <input type="text" id="hoehe">
+    </div>
+    <div class="field-row" style="grid-column: 1 / -1; grid-template-columns: 210px 1fr;">
+      <label for="veranstaltung" style="white-space:nowrap;">Manifestazione (denominazione):</label>
+      <input type="text" id="veranstaltung">
+    </div>
+  </div>
+
+  <div class="reasons-box">
+    <div class="intro">Secondo l'art. 26 OATC un'autorizzazione viene rilasciata per i seguenti motivi, selezionare quello/i pertinente/i:</div>
+    <div class="reason-line">
+      <span class="letter">a)</span>
+      <label><input type="checkbox" id="reasonA"> Manifestazione sportiva di importanza nazionale o internazionale;</label>
+    </div>
+    <div class="reason-line">
+      <span class="letter">b)</span>
+      <label><input type="checkbox" id="reasonB1"> Tradizionale</label>
+      <label><input type="checkbox" id="reasonB2"> culturale</label>
+      <label><input type="checkbox" id="reasonB3"> religiosa</label>
+      <span>festività locale di importanza regionale;</span>
+    </div>
+    <div class="reason-line">
+      <span class="letter">c)</span>
+      <label><input type="checkbox" id="reasonC"> Guasto imprevisto di impianti di trasporto persone di importanza turistica.</label>
+    </div>
+  </div>
+
+  <div class="check-box">
+    <div class="check-line">
+      <input type="checkbox" id="confirmSchutzgebiet">
+      <label for="confirmSchutzgebiet">Cliccare qui per confermare che la piazzola di atterraggio <u>non</u> si trova in una zona protetta ai sensi dell'art. 19 OATC.</label>
+    </div>
+    <div class="check-line">
+      <input type="checkbox" id="confirmKarte">
+      <label for="confirmKarte">Deve essere allegata una carta con la piazzola di atterraggio e le rotte di avvicinamento e decollo.</label>
+    </div>
+    <div class="check-line">
+      <input type="checkbox" id="confirmSicherheitskonzept">
+      <label for="confirmSicherheitskonzept">Se operano più imprese di elicotteri, deve essere allegato un "piano di sicurezza" comune.</label>
+    </div>
+  </div>
+
+  <div class="flugdaten">
+    <h3>Dati di volo</h3>
+    <div class="flugdaten-grid">
+      <div>
+        <label style="font-size:13px;">Data (data di riserva), numero di rotazioni, orari di atterraggio e decollo:</label>
+        <textarea id="flugdaten"></textarea>
+      </div>
+      <div>
+        <label style="font-size:13px; font-weight:bold;">Responsabile delle operazioni di volo (NPFO)</label>
+        <div class="sig-mini"><label for="npfoDatum">Data:</label><input type="text" id="npfoDatum"></div>
+        <div class="sig-mini"><label for="npfoUnterschrift">Firma:</label><input type="text" id="npfoUnterschrift"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="approval-box">
+    <div class="title-row">
+      <span class="title-text">Consenso dell'organizzatore <span class="hint">(se presente)</span>:</span>
+      <label class="name-label" for="veranstalterName">Nome:</label>
+      <input class="name-input" type="text" id="veranstalterName">
+    </div>
+    <div class="approval-pair">
+      <div class="approval-pair-item datum"><label for="veranstalterDatum">Data:</label><input type="text" id="veranstalterDatum"></div>
+      <div class="approval-pair-item sig"><label for="veranstalterUnterschrift">Firma:</label><input type="text" id="veranstalterUnterschrift"></div>
+    </div>
+  </div>
+
+  <div class="approval-box">
+    <div class="title-row">
+      <span class="title-text">Consenso del proprietario del terreno:</span>
+      <label class="name-label" for="grundeigName">Nome:</label>
+      <input class="name-input" type="text" id="grundeigName">
+    </div>
+    <div class="approval-pair">
+      <div class="approval-pair-item datum"><label for="grundeigDatum">Data:</label><input type="text" id="grundeigDatum"></div>
+      <div class="approval-pair-item sig"><label for="grundeigUnterschrift">Firma:</label><input type="text" id="grundeigUnterschrift"></div>
+    </div>
+  </div>
+
+  <div class="approval-box">
+    <div class="title-row">
+      <span class="title-text">Consenso del Comune:</span>
+      <label class="name-label" for="gemeindeName">Nome dell'autorità:</label>
+      <input class="name-input" type="text" id="gemeindeName">
+    </div>
+    <div class="approval-pair">
+      <div class="approval-pair-item datum"><label for="gemeindeDatum">Data:</label><input type="text" id="gemeindeDatum"></div>
+      <div class="approval-pair-item sig"><label for="gemeindeUnterschrift">Firma:</label><input type="text" id="gemeindeUnterschrift"></div>
+    </div>
+  </div>
+
+  <div class="approval-box">
+    <div class="title-row">
+      <span class="title-text">Consenso del Cantone:</span>
+      <label class="name-label" for="kantonName">Nome dell'autorità:</label>
+      <input class="name-input" type="text" id="kantonName">
+    </div>
+    <div class="approval-pair">
+      <div class="approval-pair-item datum"><label for="kantonDatum">Data:</label><input type="text" id="kantonDatum"></div>
+      <div class="approval-pair-item sig"><label for="kantonUnterschrift">Firma:</label><input type="text" id="kantonUnterschrift"></div>
+    </div>
+  </div>
+
+  <div class="admin-footer">
+    <div class="admin-title">— ADMINISTRATIVE INFORMATION – FOR FOCA ONLY —</div>
+    <table>
+      <tr>
+        <td><span class="lbl">Business Object</span> 311.122.004.IT</td>
+        <td><span class="lbl">Prepared by</span> SBHE / hep</td>
+        <td><span class="lbl">Released by</span> SL SBHE / 01.05.2021</td>
+      </tr>
+      <tr>
+        <td><span class="lbl">Document Owner</span> SBHE</td>
+        <td><span class="lbl">Revised by</span></td>
+        <td><span class="lbl">Distribution</span> Internal / External</td>
+      </tr>
+    </table>
+    <div class="bottom-line">
+      <span>Gesuch ALB-über 1100m - IT&nbsp;&nbsp;&nbsp;BAZL, Helicopter Flight Operations, 3003 Berne / Email: heli@bazl.admin.ch</span>
+      <span>ISS 01 / REV 00 / 01.05.2021</span>
+    </div>
+  </div>
+
+</form>
+
+<script>
+(function () {
+  const FORM_KEY = 'bazl_alb_ueber_1100m';
+  const form = document.getElementById('bazlForm');
+  const statusText = document.getElementById('statusText');
+  let dirty = false;
+
+  function markDirty() { dirty = true; setStatus('Modifiche non salvate'); }
+  form.addEventListener('input', markDirty);
+  form.addEventListener('change', markDirty);
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function collectData() {
+    const data = {};
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => data[el.id] = el.value);
+    form.querySelectorAll('input[type=checkbox]').forEach(el => data[el.id] = el.checked);
+    return data;
+  }
+  function applyData(data) {
+    if (!data) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => {
+      if (data[el.id] !== undefined) el.value = data[el.id];
+    });
+    form.querySelectorAll('input[type=checkbox]').forEach(el => {
+      if (data[el.id] !== undefined) el.checked = data[el.id];
+    });
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    localStorage.setItem(FORM_KEY, JSON.stringify(collectData()));
+    dirty = false;
+    setStatus('Salvato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+  document.getElementById('loadBtn').addEventListener('click', function () {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (!raw) { setStatus('Nessuno stato salvato trovato'); return; }
+    applyData(JSON.parse(raw));
+    dirty = false;
+    setStatus('Caricato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+
+  function validateRequired() {
+    let ok = true; let firstInvalid = null;
+    form.querySelectorAll('[required]').forEach(el => {
+      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; if (!firstInvalid) firstInvalid = el; }
+      else { el.classList.remove('invalid'); }
+    });
+    if (!ok && firstInvalid) { firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstInvalid.focus(); }
+    return ok;
+  }
+
+  document.getElementById('printBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Si prega di compilare i campi obbligatori (*)'); return; }
+    window.print();
+  });
+
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    if (!validateRequired()) { setStatus('Si prega di compilare i campi obbligatori (*)'); return; }
+    const subject = encodeURIComponent('Domanda ALB sopra 1100m - ' + (document.getElementById('betrieb').value || 'Impresa'));
+    const body = encodeURIComponent(
+      'Gentili Signore, Gentili Signori\n\n' +
+      'In allegato il modulo di domanda compilato per atterraggi sopra 1100 m/M.\n\n' +
+      'Nota: si prega di allegare manualmente a questa e-mail il PDF generato tramite "Stampa / Salva come PDF" ' +
+      'e tutti i consensi necessari (un allegato automatico non è possibile dal browser).\n\n' +
+      'Cordiali saluti'
+    );
+    window.location.href = `mailto:heli@bazl.admin.ch?subject=${subject}&body=${body}`;
+  });
+
+  const existing = localStorage.getItem(FORM_KEY);
+  if (existing) { applyData(JSON.parse(existing)); setStatus('Stato salvato caricato'); }
+})();
+</script>
+
+</body>
+</html>

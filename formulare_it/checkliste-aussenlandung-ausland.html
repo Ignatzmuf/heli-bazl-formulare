@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist autorizzazione atterraggio esterno — UFAC</title>
+<style>
+  :root { --ch-red: #FF0000; --ink: #1a1a1a; --box-bg: #f2f2f2; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--ink); margin: 0; background: #dedede; }
+  .toolbar {
+    position: sticky; top: 0; z-index: 10; background: #2b2f33; color: #fff;
+    padding: 10px 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 14px;
+  }
+  .toolbar a { color: #fff; text-decoration: none; opacity: .85; }
+  .toolbar a:hover { opacity: 1; }
+  .toolbar button {
+    background: var(--ch-red); color: #fff; border: none; padding: 8px 14px;
+    border-radius: 3px; cursor: pointer; font-size: 13px; font-family: inherit;
+  }
+  .toolbar button.secondary { background: #545a5f; }
+  .toolbar button:hover { filter: brightness(1.1); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .status { font-size: 12px; opacity: .8; }
+  .lang-menu { display: flex; gap: 6px; }
+  .lang-menu a, .lang-menu .lang-current { padding: 3px 8px; border-radius: 3px; font-size: 12px; text-decoration: none; font-family: inherit; }
+  .lang-menu .lang-current { background: var(--ch-red); color: #fff; font-weight: bold; }
+  .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
+  .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
+
+  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+
+  .header {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
+    padding-bottom: 16px; border-bottom: 2px solid var(--ch-red); margin-bottom: 20px;
+  }
+  .crest { width: 46px; height: auto; flex-shrink: 0; display: block; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-left .country { font-size: 11px; line-height: 1.4; }
+  .header-right { text-align: right; font-size: 12px; line-height: 1.5; }
+  .header-right strong { display: block; font-size: 13px; }
+
+  h1.doc-title { font-size: 16px; margin: 4px 0 2px; font-weight: normal; }
+  .subtitle { font-size: 17px; margin: 4px 0 14px; font-weight: bold; line-height: 1.35; }
+
+  .info-box { background: var(--box-bg); border: 1px solid #ccc; padding: 12px 16px; font-size: 12.5px; line-height: 1.55; margin-bottom: 18px; }
+  .info-box .info-title { font-weight: bold; margin-bottom: 4px; }
+  .info-box .gap { margin-top: 8px; }
+  .info-box a { color: var(--ch-red); word-break: break-all; }
+
+  .lead-in { font-size: 13.5px; margin-bottom: 4px; font-weight: bold; }
+  .lead-in .note { font-weight: normal; font-style: italic; font-size: 12px; }
+
+  .checklist { border: 1px solid #999; margin-bottom: 4px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 14px; border-bottom: 1px solid #ddd; font-size: 13.5px; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ch-red); }
+  .check-item .num { font-weight: bold; min-width: 20px; }
+
+  .group-heading { font-weight: bold; font-size: 13.5px; margin: 16px 0 6px; }
+  .group-heading .sub { font-weight: normal; font-size: 12px; font-style: italic; display: block; margin-top: 2px; }
+
+  .progress { font-size: 13px; margin: 14px 0 20px; padding: 8px 14px; background: #eef4ec; border: 1px solid #ccd; }
+
+  .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
+  .admin-footer .admin-title { text-align: center; font-style: italic; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
+  .admin-footer table { width: 100%; border-collapse: collapse; }
+  .admin-footer td { padding: 1px 4px; vertical-align: top; }
+  .admin-footer .lbl { color: #777; }
+  .admin-footer .bottom-line { display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 3px; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none !important; }
+    .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
+    .header, .info-box, .checklist, .admin-footer {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .header { margin-bottom: 4px; padding-bottom: 4px; }
+    .subtitle { margin-bottom: 4px; }
+    .info-box { padding: 5px 14px; margin-bottom: 4px; line-height: 1.22; font-size: 11.5px; }
+    .info-box .gap { margin-top: 3px; }
+    .lead-in { margin-bottom: 2px; }
+    .checklist { margin-bottom: 1px; }
+    .check-item { padding: 2px 14px; font-size: 12.5px; }
+    .group-heading { margin: 3px 0 2px; font-size: 12.5px; }
+    .group-heading .sub { margin-top: 1px; }
+    .progress { margin: 4px 0 5px; padding: 4px 14px; }
+    .admin-footer { margin-top: 2px; padding-top: 2px; }
+    @page { size: A4; margin: 7mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../index_it.html">&larr; Panoramica</a>
+  <nav class="lang-menu" aria-label="Lingua">
+    <a href="../formulare_de/checkliste-aussenlandung-ausland.html">DE</a>
+    <a href="../formulare_fr/checkliste-aussenlandung-ausland.html">FR</a>
+    <span class="lang-current">IT</span>
+    <a href="../formulare_en/checkliste-aussenlandung-ausland.html">EN</a>
+  </nav>
+  <div class="spacer"></div>
+  <span class="status" id="statusText"></span>
+  <button type="button" class="secondary" id="loadBtn">Carica</button>
+  <button type="button" class="secondary" id="saveBtn">Salva</button>
+  <button type="button" id="printBtn">Stampa / Salva come PDF</button>
+  <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+</div>
+
+<form class="sheet" id="bazlForm" novalidate>
+
+  <div class="header">
+    <div class="header-left">
+      <svg class="crest" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M4,4 Q4,2 6,2 L94,2 Q96,2 96,4 L96,58 C96,84 76,100 50,110 C24,100 4,84 4,58 Z" fill="#FF0000"/>
+        <rect x="26.67" y="38" width="46.67" height="20" fill="#fff"/>
+        <rect x="40" y="24.67" width="20" height="46.67" fill="#fff"/>
+      </svg>
+      <div class="country">
+        Schweizerische Eidgenossenschaft<br>
+        Confédération suisse<br>
+        Confederazione Svizzera<br>
+        Confederaziun svizra
+      </div>
+    </div>
+    <div class="header-right">
+      Dipartimento federale dell'ambiente,<br>
+      dei trasporti, dell'energia e delle comunicazioni DATEC
+      <strong>Ufficio federale dell'aviazione civile UFAC</strong>
+      Sicurezza delle operazioni di volo
+    </div>
+  </div>
+
+  <h1 class="doc-title">Checklist dei documenti da presentare per un'autorizzazione di atterraggio esterno:</h1>
+  <div class="subtitle">
+    Atterraggio/i al di fuori di un aerodromo/eliporto<br>
+    con un elicottero immatricolato all'estero
+  </div>
+
+  <div class="info-box">
+    <div class="info-title">Informazioni generali</div>
+    &gt; Base legale: Ordinanza sull'atterraggio esterno (OATC; RS 748.132.3).<br>
+    &gt; Per i voli commerciali vanno osservati in particolare gli art. 4, 5, 6, 7, 11, 12, 13, 15, 16, 18, 19, 25 e 30,
+    per quelli non commerciali gli art. 4, 5, 6, 7, 11, 12, 13, 15, 16, 18, 19, 30 e 32.<br>
+    &gt; Si presuppone il consenso del proprietario del terreno.<br>
+    &gt; Sono vietati gli atterraggi in zone residenziali o di protezione della natura, sopra i 1100 m s.l.m. e di notte.<br>
+    &gt; Gli atterraggi su una piazzola di montagna (PDM) sono possibili solo con una licenza di pilota svizzera MOU(H).<br>
+    &gt; I voli transfrontalieri devono avvenire tramite un aerodromo doganale.<br>
+    &gt; Se l'atterraggio avviene in occasione di una manifestazione, è necessario il consenso dell'organizzatore.<br>
+    &gt; Per le operazioni "high-risk SPO" è inoltre necessaria una "cross-border high-risk authorisation" (vedi link).
+
+    <div class="gap">
+      &gt; Link alle informazioni SPO: <a href="https://www.bazl.admin.ch/spo" target="_blank" rel="noopener">https://www.bazl.admin.ch/spo</a><br>
+      &gt; Link alle carte degli ostacoli alla navigazione aerea: <a href="https://map.geo.admin.ch/?topic=aviation" target="_blank" rel="noopener">https://map.geo.admin.ch/?topic=aviation</a><br>
+      &gt; Link alle restrizioni dello spazio aereo svizzero (DABS): <a href="https://www.skybriefing.com" target="_blank" rel="noopener">www.skybriefing.com</a>
+    </div>
+
+    <div class="gap">
+      &gt; Per l'elaborazione della domanda occorre calcolare 10 giorni lavorativi.<br>
+      &gt; L'autorizzazione viene rilasciata per una durata massima di 1 anno.<br>
+      &gt; Tassa 500.- CHF per autorizzazione (secondo l'art. 38 cpv. 1 lett. f numero 1, OTa-UFAC; RS 748.112.11)<br>
+      &gt; La domanda deve essere inoltrata dal richiedente via e-mail a <a href="mailto:heli@bazl.admin.ch">heli@bazl.admin.ch</a>.
+    </div>
+  </div>
+
+  <div class="lead-in">
+    Domanda via e-mail con le seguenti indicazioni, risp. copie di documenti in allegato:
+    <div class="note">In caso di necessità, potranno essere richieste ulteriori informazioni e/o documenti.</div>
+  </div>
+
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item1"><span><span class="num">1)</span> Nome e indirizzo del richiedente</span></label>
+    <label class="check-item"><input type="checkbox" id="item2"><span><span class="num">2)</span> Nome e indirizzo per la fatturazione (se diverso)</span></label>
+    <label class="check-item"><input type="checkbox" id="item3"><span><span class="num">3)</span> Categoria di volo desiderata: CAT, SPO, NCC o NCO (solo una possibile per autorizzazione)</span></label>
+    <label class="check-item"><input type="checkbox" id="item4"><span><span class="num">4)</span> Per quale periodo viene richiesta l'autorizzazione (massimo 1 anno possibile)</span></label>
+  </div>
+
+  <div class="group-heading">
+    Pilota:
+    <span class="sub">Per motivi di sicurezza aerea, occorre garantire che i piloti siano formati in modo tale da
+    soddisfare i requisiti di base per gli atterraggi esterni in terreni topograficamente impegnativi.</span>
+  </div>
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item5"><span><span class="num">5)</span> Indicazioni sulla formazione e sull'esperienza in materia di atterraggi esterni (art. 7a OATC).</span></label>
+    <label class="check-item"><input type="checkbox" id="item6"><span><span class="num">6)</span> Autodichiarazione del pilota di conoscere le basi legali determinanti e di avere familiarità con le pubblicazioni aeronautiche pubbliche rilevanti (art. 7b OATC).</span></label>
+    <label class="check-item"><input type="checkbox" id="item7"><span><span class="num">7)</span> Licenza di pilota</span></label>
+    <label class="check-item"><input type="checkbox" id="item8"><span><span class="num">8)</span> Certificato medico</span></label>
+  </div>
+
+  <div class="group-heading">Solo per voli CAT:</div>
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item9"><span><span class="num">9)</span> Air Operator Certificate AOC (modulo EASA 138)</span></label>
+    <label class="check-item"><input type="checkbox" id="item10"><span><span class="num">10)</span> Operations Specifications dell'/degli elicottero/i (modulo EASA 139)</span></label>
+  </div>
+
+  <div class="group-heading">Per tutti gli altri voli: SPO, NCC, NCO</div>
+  <div class="checklist">
+    <label class="check-item"><input type="checkbox" id="item11"><span><span class="num">11)</span> Certificato di navigabilità dell'elicottero</span></label>
+    <label class="check-item"><input type="checkbox" id="item12"><span><span class="num">12)</span> Airworthiness Review Certificate ARC (modulo EASA 15)</span></label>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="admin-footer">
+    <div class="admin-title">— ADMINISTRATIVE INFORMATION – FOR FOCA ONLY —</div>
+    <table>
+      <tr>
+        <td><span class="lbl">Business Object</span> 313.212 e 313.222</td>
+        <td><span class="lbl">Prepared by</span> SBHE / hep</td>
+        <td><span class="lbl">Released by</span> SL SBHE / 01.02.2021</td>
+      </tr>
+      <tr>
+        <td><span class="lbl">Document Owner</span> SBHE</td>
+        <td><span class="lbl">Revised by</span></td>
+        <td><span class="lbl">Distribution</span> Internal / External</td>
+      </tr>
+    </table>
+    <div class="bottom-line">
+      <span>ISS 01 / REV 00 / 01.02.2021&nbsp;&nbsp;&nbsp;BAZL, Helicopter Flight Operations, 3003 Berne / Email: heli@bazl.admin.ch</span>
+      <span>Form 313.210.001.IT</span>
+    </div>
+  </div>
+
+</form>
+
+<script>
+(function () {
+  const FORM_KEY = 'bazl_checkliste_aussenlandung_ausland';
+  const form = document.getElementById('bazlForm');
+  const statusText = document.getElementById('statusText');
+  const progress = document.getElementById('progress');
+  const checkboxes = Array.from(form.querySelectorAll('input[type=checkbox]'));
+  let dirty = false;
+
+  function updateProgress() {
+    const checked = checkboxes.filter(c => c.checked).length;
+    progress.textContent = `Stato: ${checked} di ${checkboxes.length} documenti contrassegnati come disponibili.`;
+  }
+
+  function markDirty() { dirty = true; setStatus('Modifiche non salvate'); updateProgress(); }
+  form.addEventListener('change', markDirty);
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function collectData() {
+    const data = {};
+    checkboxes.forEach(el => data[el.id] = el.checked);
+    return data;
+  }
+  function applyData(data) {
+    if (!data) return;
+    checkboxes.forEach(el => { if (data[el.id] !== undefined) el.checked = data[el.id]; });
+    updateProgress();
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    localStorage.setItem(FORM_KEY, JSON.stringify(collectData()));
+    dirty = false;
+    setStatus('Salvato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+  document.getElementById('loadBtn').addEventListener('click', function () {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (!raw) { setStatus('Nessuno stato salvato trovato'); return; }
+    applyData(JSON.parse(raw));
+    dirty = false;
+    setStatus('Caricato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    const checked = checkboxes.filter(c => c.checked).length;
+    const subject = encodeURIComponent('Domanda autorizzazione atterraggio esterno (elicottero estero)');
+    const body = encodeURIComponent(
+      'Gentili Signore, Gentili Signori\n\n' +
+      `Con la presente inoltro la mia domanda per un'autorizzazione di atterraggio esterno. Stato checklist: ${checked} di ${checkboxes.length} documenti pronti.\n\n` +
+      'Si prega di allegare tutti i documenti/indicazioni elencati nella checklist come allegato o nel testo di questa e-mail.\n\n' +
+      'Cordiali saluti'
+    );
+    window.location.href = `mailto:heli@bazl.admin.ch?subject=${subject}&body=${body}`;
+  });
+
+  const existing = localStorage.getItem(FORM_KEY);
+  if (existing) { applyData(JSON.parse(existing)); setStatus('Stato salvato caricato'); }
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>
