@@ -28,8 +28,16 @@
   .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
   .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
 
-  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+  .sheet { position: relative; max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+  .page { position: relative; }
   .page + .page { margin-top: 30px; padding-top: 30px; border-top: 3px dashed #ccc; }
+  .pen-toggle[aria-pressed="true"] { background: var(--ch-red); }
+  .toolbar [hidden] { display: none !important; }
+  .pen-canvas {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    pointer-events: none; touch-action: none; z-index: 5;
+  }
+  .pen-canvas.pen-active { pointer-events: auto; cursor: crosshair; }
 
   .header {
     display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
@@ -59,10 +67,10 @@
   .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
     border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
   }
-  .field-row input.invalid, .field-row textarea.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
   .required::after { content: " *"; color: var(--ch-red); }
 
-  .field-grid-2 { display: grid; grid-template-columns: 3fr 2fr; gap: 8px 24px; }
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
 
   .check-line { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 13px; }
   .check-line input[type=checkbox] { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ch-red); }
@@ -76,20 +84,6 @@
   .sig-row { display: grid; grid-template-columns: 220px 1fr; align-items: center; gap: 8px; margin-top: 10px; }
   .sig-row label { font-size: 13px; }
   .sig-row input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 3px 2px; width: 100%; }
-  .sig-row.sig-widget { grid-template-columns: 220px 1fr auto; }
-
-  .sig-box { position: relative; width: 100%; height: 44px; border: 1px solid #333; background: #fff; box-sizing: border-box; overflow: hidden; }
-  .sig-box input, .sig-box textarea { display: block; width: 100%; height: 100%; box-sizing: border-box; border: none; background: transparent; padding: 4px 6px; font-family: inherit; font-size: 13px; resize: none; }
-  .sig-box canvas.sig-pad { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-
-  .sig-mode-toggle { display: inline-flex; gap: 4px; }
-  .sig-mode-btn, .sig-clear-btn {
-    font-size: 11px; line-height: 1; padding: 4px 8px; border: 1px solid #999; background: #fff;
-    color: var(--ink); border-radius: 2px; cursor: pointer; font-family: inherit;
-  }
-  .sig-mode-btn[aria-pressed="true"] { background: var(--ch-red); border-color: var(--ch-red); color: #fff; font-weight: bold; }
-  .sig-mode-btn:hover, .sig-clear-btn:hover { filter: brightness(1.05); }
-  .sig-hidden { display: none !important; }
 
   .page-footer { font-size: 11px; color: #555; text-align: right; margin-top: 10px; font-style: italic; }
 
@@ -123,6 +117,7 @@
   @media print {
     body { background: #fff; }
     .toolbar { display: none !important; }
+    #penBtn, #penClearBtn { display: none !important; }
     .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
     .header, .legal-box, .instructions, .section-box, .question-block, .admin-footer {
       break-inside: avoid; page-break-inside: avoid;
@@ -143,9 +138,6 @@
     textarea.tall { min-height: 46px; }
     textarea.medium { min-height: 26px; }
     .sig-row { margin-top: 5px; }
-    .sig-mode-toggle, .sig-clear-btn { display: none !important; }
-    .sig-box { height: 20px; }
-    .autogrow-field { line-height: 1.15 !important; padding: 1px 2px !important; }
     .page-footer { margin-top: 4px; }
     .authority-section { padding: 6px 16px; margin-bottom: 6px; }
     .authority-section .badge { margin-bottom: 5px; }
@@ -174,6 +166,8 @@
   <button type="button" class="secondary" id="saveBtn">Save</button>
   <button type="button" id="printBtn">Print / Save as PDF</button>
   <button type="button" class="secondary" id="mailBtn">Send by e-mail</button>
+  <button type="button" class="secondary pen-toggle" id="penBtn" aria-pressed="false">✍ Pen</button>
+  <button type="button" class="secondary" id="penClearBtn" hidden>Clear</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -228,9 +222,9 @@
     <div class="section-box">
       <div class="section-title">2. Helicopter operator:</div>
       <div class="field-grid-2">
-        <div class="field-row"><label for="firmaName" class="required">Company name:</label><input type="text" id="firmaName" class="no-autogrow" required></div>
+        <div class="field-row"><label for="firmaName" class="required">Company name:</label><input type="text" id="firmaName" required></div>
         <div class="field-row"><label for="aocNr">AOC No.:</label><input type="text" id="aocNr"></div>
-        <div class="field-row"><label for="email" class="required">Email address:</label><input type="email" id="email" class="no-autogrow" required></div>
+        <div class="field-row"><label for="email" class="required">Email address:</label><input type="email" id="email" required></div>
         <div class="field-row"><label for="sproHraNr">SPO.HRA No.:</label><input type="text" id="sproHraNr"></div>
         <div class="field-row" style="grid-column: 2 / 3;"><label for="telefon">Phone No.:</label><input type="tel" id="telefon"></div>
       </div>
@@ -251,17 +245,9 @@
       </label>
       <textarea id="begruendungTransport" class="tall"></textarea>
 
-      <div class="sig-row sig-widget">
+      <div class="sig-row">
         <label for="sigNpfo">Date and signature of the flight operations manager (NPFO):</label>
-        <div class="sig-box">
-          <input type="text" id="sigNpfo">
-          <canvas class="sig-pad sig-hidden" width="660" height="44"></canvas>
-        </div>
-        <span class="sig-mode-toggle" role="group" aria-label="Input mode">
-          <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨ Keyboard</button>
-          <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍ Draw</button>
-          <button type="button" class="sig-clear-btn sig-hidden">Clear</button>
-        </span>
+        <input type="text" id="sigNpfo">
       </div>
     </div>
 
@@ -269,13 +255,14 @@
       <div class="section-title">3. Client:</div>
       <div class="field-row"><label for="auftraggeberName">Name, address:</label><input type="text" id="auftraggeberName"></div>
       <div class="field-grid-2">
-        <div class="field-row"><label for="auftraggeberEmail">Email address:</label><input type="email" id="auftraggeberEmail" class="no-autogrow"></div>
+        <div class="field-row"><label for="auftraggeberEmail">Email address:</label><input type="email" id="auftraggeberEmail"></div>
         <div class="field-row"><label for="auftraggeberTelefon">Phone No.:</label><input type="tel" id="auftraggeberTelefon"></div>
       </div>
       <div class="field-row"><label for="zweckTransport">Purpose of the air transport:</label><input type="text" id="zweckTransport"></div>
     </div>
 
     <div class="page-footer">Page 1 of 2</div>
+    <canvas class="pen-canvas" id="penCanvas1" width="850" height="1200"></canvas>
   </div>
 
   <!-- ===================== PAGE 2 ===================== -->
@@ -358,17 +345,9 @@
       <label style="font-size:13px; display:block; margin-bottom:6px;" for="bemerkungen">Remarks:</label>
       <textarea id="bemerkungen" class="medium"></textarea>
 
-      <div class="sig-row sig-widget">
+      <div class="sig-row">
         <label for="sigBehoerde">Date, name, stamp/signature:</label>
-        <div class="sig-box">
-          <input type="text" id="sigBehoerde">
-          <canvas class="sig-pad sig-hidden" width="660" height="44"></canvas>
-        </div>
-        <span class="sig-mode-toggle" role="group" aria-label="Input mode">
-          <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨ Keyboard</button>
-          <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍ Draw</button>
-          <button type="button" class="sig-clear-btn sig-hidden">Clear</button>
-        </span>
+        <input type="text" id="sigBehoerde">
       </div>
     </div>
 
@@ -380,9 +359,109 @@
         <span>Form 311.122.005_AL Schutzgebiet_e_MAI2017</span>
       </div>
     </div>
+    <canvas class="pen-canvas" id="penCanvas2" width="850" height="1200"></canvas>
   </div>
 
 </form>
+
+<script>
+(function () {
+  const canvasIds = ['penCanvas1', 'penCanvas2'];
+  const penBtn = document.getElementById('penBtn');
+  const clearBtn = document.getElementById('penClearBtn');
+  const form = document.getElementById('bazlForm');
+  let penOn = false;
+
+  function markDirty() { form.dispatchEvent(new Event('input', { bubbles: true })); }
+
+  const pens = canvasIds.map(function (id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
+    let drawing = false, hasDrawing = false;
+
+    function drawImageDataUrl(src) {
+      const img = new Image();
+      img.onload = function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        hasDrawing = true;
+      };
+      img.src = src;
+    }
+
+    function sizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const prev = hasDrawing ? canvas.toDataURL('image/png') : null;
+      canvas.width = Math.max(1, Math.round(rect.width));
+      canvas.height = Math.max(1, Math.round(rect.height));
+      ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
+      if (prev) drawImageDataUrl(prev);
+    }
+
+    function pos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - rect.left) * (canvas.width / rect.width),
+        y: (e.clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    canvas.addEventListener('pointerdown', function (e) {
+      if (!penOn) return;
+      canvas.setPointerCapture(e.pointerId);
+      drawing = true;
+      const p = pos(e);
+      ctx.beginPath(); ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    });
+    canvas.addEventListener('pointermove', function (e) {
+      if (!drawing) return;
+      const p = pos(e);
+      ctx.lineTo(p.x, p.y); ctx.stroke();
+      e.preventDefault();
+    });
+    function endStroke() {
+      if (!drawing) return;
+      drawing = false;
+      hasDrawing = true;
+      markDirty();
+    }
+    canvas.addEventListener('pointerup', endStroke);
+    canvas.addEventListener('pointercancel', endStroke);
+
+    window.addEventListener('load', sizeCanvas);
+
+    return {
+      canvas: canvas,
+      setActive: function (on) { canvas.classList.toggle('pen-active', on); },
+      clear: function () { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; },
+      collect: function () { return hasDrawing ? canvas.toDataURL('image/png') : null; },
+      apply: function (src) { if (src) drawImageDataUrl(src); else { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; } }
+    };
+  });
+
+  penBtn.addEventListener('click', function () {
+    penOn = !penOn;
+    penBtn.setAttribute('aria-pressed', String(penOn));
+    pens.forEach(function (p) { p.setActive(penOn); });
+    clearBtn.hidden = !penOn;
+  });
+  clearBtn.addEventListener('click', function () {
+    pens.forEach(function (p) { p.clear(); });
+    markDirty();
+  });
+
+  window.bazlPenCollect = function () {
+    return { penDrawing1: pens[0].collect(), penDrawing2: pens[1].collect() };
+  };
+  window.bazlPenApply = function (data) {
+    if (!data) return;
+    pens[0].apply(data.penDrawing1);
+    pens[1].apply(data.penDrawing2);
+  };
+})();
+</script>
 
 <script>
 (function () {
@@ -405,6 +484,7 @@
     form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => data[el.id] = el.value);
     form.querySelectorAll('input[type=checkbox]').forEach(el => data[el.id] = el.checked);
     form.querySelectorAll('input[type=radio]:checked').forEach(el => data[el.name] = el.value);
+    Object.assign(data, window.bazlPenCollect());
     return data;
   }
   function applyData(data) {
@@ -421,6 +501,7 @@
         if (radio) radio.checked = true;
       }
     });
+    window.bazlPenApply(data);
   }
 
   document.getElementById('saveBtn').addEventListener('click', function () {
@@ -466,156 +547,6 @@
 
   const existing = localStorage.getItem(FORM_KEY);
   if (existing) { applyData(JSON.parse(existing)); setStatus('Saved state loaded'); }
-})();
-</script>
-
-<script>
-(function () {
-  function initSigDual(root) {
-    const box = root.querySelector('.sig-box');
-    const valueEl = box.querySelector('input, textarea');
-    const canvas = box.querySelector('canvas.sig-pad');
-    const clearBtn = root.querySelector('.sig-clear-btn');
-    const kbBtn = root.querySelector('.sig-mode-btn[data-mode="keyboard"]');
-    const drawBtn = root.querySelector('.sig-mode-btn[data-mode="draw"]');
-    const ctx = canvas.getContext('2d');
-    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a1a1a';
-
-    const fallbackMode = root.dataset.sigDefault === 'draw' ? 'draw' : 'keyboard';
-    let mode = fallbackMode;
-    let textValue = valueEl.value || '';
-    let hasDrawing = false;
-    let drawing = false;
-
-    function setValue(v) {
-      if (valueEl.value === v) return;
-      valueEl.value = v;
-      valueEl.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    function setMode(next) {
-      mode = next;
-      kbBtn.setAttribute('aria-pressed', String(mode === 'keyboard'));
-      drawBtn.setAttribute('aria-pressed', String(mode === 'draw'));
-      valueEl.classList.toggle('sig-hidden', mode !== 'keyboard');
-      canvas.classList.toggle('sig-hidden', mode !== 'draw');
-      clearBtn.classList.toggle('sig-hidden', mode !== 'draw');
-      if (mode === 'keyboard') setValue(textValue);
-      else setValue(hasDrawing ? canvas.toDataURL('image/png') : '');
-    }
-
-    kbBtn.addEventListener('click', function () { if (mode !== 'keyboard') setMode('keyboard'); });
-    drawBtn.addEventListener('click', function () { if (mode !== 'draw') setMode('draw'); });
-    valueEl.addEventListener('input', function () { if (mode === 'keyboard') textValue = valueEl.value; });
-
-    function pos(e) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height)
-      };
-    }
-    canvas.addEventListener('pointerdown', function (e) {
-      canvas.setPointerCapture(e.pointerId);
-      drawing = true;
-      const p = pos(e);
-      ctx.beginPath(); ctx.moveTo(p.x, p.y);
-      e.preventDefault();
-    });
-    canvas.addEventListener('pointermove', function (e) {
-      if (!drawing) return;
-      const p = pos(e);
-      ctx.lineTo(p.x, p.y); ctx.stroke();
-      e.preventDefault();
-    });
-    function endStroke() {
-      if (!drawing) return;
-      drawing = false;
-      hasDrawing = true;
-      setValue(canvas.toDataURL('image/png'));
-    }
-    canvas.addEventListener('pointerup', endStroke);
-    canvas.addEventListener('pointercancel', endStroke);
-
-    clearBtn.addEventListener('click', function () {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      hasDrawing = false;
-      if (mode === 'draw') setValue('');
-    });
-
-    function restoreFromValue() {
-      const v = valueEl.value || '';
-      if (v.indexOf('data:image/') === 0) {
-        const img = new Image();
-        img.onload = function () {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
-        img.src = v;
-        hasDrawing = true;
-        setMode('draw');
-      } else {
-        textValue = v;
-        hasDrawing = false;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        setMode(v ? 'keyboard' : fallbackMode);
-      }
-    }
-
-    restoreFromValue();
-    return { restoreFromValue: restoreFromValue };
-  }
-
-  const controllers = Array.prototype.map.call(document.querySelectorAll('.sig-widget'), initSigDual);
-  const loadBtn = document.getElementById('loadBtn');
-  if (loadBtn) {
-    loadBtn.addEventListener('click', function () {
-      controllers.forEach(function (c) { c.restoreFromValue(); });
-    });
-  }
-})();
-</script>
-
-<script>
-(function () {
-  function autoGrow(el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-  }
-  function convert(input) {
-    const cs = getComputedStyle(input);
-    const ta = document.createElement('textarea');
-    Array.prototype.forEach.call(input.attributes, function (attr) {
-      if (attr.name === 'type') return;
-      ta.setAttribute(attr.name, attr.value);
-    });
-    ta.rows = 1;
-    ta.value = input.value;
-    ta.classList.add('autogrow-field');
-    ta.style.cssText =
-      'display:block; width:100%; resize:none; overflow:hidden; box-sizing:border-box;' +
-      'border:none; border-bottom:1px solid #333; background:transparent;' +
-      'font-family:' + cs.fontFamily + '; font-size:' + cs.fontSize + '; padding:' + cs.padding + '; line-height:1.3;';
-    input.replaceWith(ta);
-    autoGrow(ta);
-    ta.addEventListener('input', function () { autoGrow(ta); });
-    return ta;
-  }
-  const fields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
-  const converted = [];
-  fields.forEach(function (input) {
-    if (input.closest('.sig-widget') || input.classList.contains('no-autogrow')) return;
-    converted.push(convert(input));
-  });
-  window.addEventListener('resize', function () {
-    converted.forEach(autoGrow);
-  });
-  const loadBtn2 = document.getElementById('loadBtn');
-  if (loadBtn2) {
-    loadBtn2.addEventListener('click', function () {
-      converted.forEach(autoGrow);
-    });
-  }
 })();
 </script>
 

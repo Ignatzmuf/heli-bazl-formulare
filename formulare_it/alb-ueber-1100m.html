@@ -33,7 +33,14 @@
   .lang-menu a { color: #fff; opacity: .8; border: 1px solid rgba(255,255,255,.35); }
   .lang-menu a:hover { opacity: 1; background: rgba(255,255,255,.15); }
 
-  .sheet { max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+  .sheet { position: relative; max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
+  .pen-toggle[aria-pressed="true"] { background: var(--ch-red); }
+  .toolbar [hidden] { display: none !important; }
+  .pen-canvas {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    pointer-events: none; touch-action: none; z-index: 5;
+  }
+  .pen-canvas.pen-active { pointer-events: auto; cursor: crosshair; }
 
   .header {
     display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;
@@ -61,7 +68,7 @@
   .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
     border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
   }
-  .field-row input.invalid, .field-row textarea.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
   .required::after { content: " *"; color: var(--ch-red); }
 
   .reasons-box { border: 1px solid #999; border-top: none; padding: 12px 16px; margin-bottom: 4px; font-size: 13.5px; }
@@ -101,21 +108,6 @@
   .approval-pair-item label { font-size: 13px; }
   .approval-pair-item input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 2px; width: 100%; }
 
-  .sig-mode-toggle { display: inline-flex; gap: 4px; }
-  .sig-mode-btn, .sig-clear-btn {
-    font-size: 10.5px; line-height: 1; padding: 3px 6px; border: 1px solid #999; background: #fff;
-    color: var(--ink); border-radius: 2px; cursor: pointer; font-family: inherit;
-  }
-  .sig-mode-btn[aria-pressed="true"] { background: var(--ch-red); border-color: var(--ch-red); color: #fff; font-weight: bold; }
-  .sig-mode-btn:hover, .sig-clear-btn:hover { filter: brightness(1.05); }
-  .sig-hidden { display: none !important; }
-  .sig-mini.sig-widget { grid-template-columns: 110px 1fr auto; }
-  .approval-pair-item.sig.sig-widget { grid-template-columns: 90px 1fr auto; }
-
-  .sig-box { position: relative; width: 100%; height: 36px; border: 1px solid #333; background: #fff; box-sizing: border-box; overflow: hidden; }
-  .sig-box input, .sig-box textarea { display: block; width: 100%; height: 100%; box-sizing: border-box; border: none; background: transparent; padding: 2px 5px; font-family: inherit; font-size: 13px; resize: none; }
-  .sig-box canvas.sig-pad { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-
   .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
   .admin-footer .admin-title { text-align: center; font-style: italic; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
   .admin-footer table { width: 100%; border-collapse: collapse; }
@@ -125,6 +117,7 @@
 
   @media print {
     body { background: #fff; }
+    #penBtn, #penClearBtn { display: none !important; }
     .toolbar { display: none !important; }
     .sheet { box-shadow: none; margin: 0; max-width: 100%; padding: 6mm 12mm; }
     .header, .legal-box, .instructions, .field-grid, .reasons-box, .check-box,
@@ -145,10 +138,6 @@
     .approval-box { padding: 3px 12px; margin-bottom: 2px; }
     .approval-box .title-row { margin-bottom: 2px; }
     .approval-row { margin-bottom: 1px; }
-    .sig-mode-toggle, .sig-clear-btn { display: none !important; }
-    .sig-box { height: 18px; }
-    .sig-box input, .sig-box textarea { padding: 1px 3px; }
-    .autogrow-field { line-height: 1.15 !important; padding: 1px 2px !important; }
     .admin-footer { margin-top: 3px; padding-top: 3px; }
     @page { size: A4; margin: 7mm; }
   }
@@ -170,6 +159,8 @@
   <button type="button" class="secondary" id="saveBtn">Salva</button>
   <button type="button" id="printBtn">Stampa / Salva come PDF</button>
   <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+  <button type="button" class="secondary pen-toggle" id="penBtn" aria-pressed="false">✍ Penna</button>
+  <button type="button" class="secondary" id="penClearBtn" hidden>Cancella</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -279,18 +270,7 @@
       <div>
         <label style="font-size:13px; font-weight:bold;">Responsabile delle operazioni di volo (NPFO)</label>
         <div class="sig-mini"><label for="npfoDatum">Data:</label><input type="text" id="npfoDatum"></div>
-        <div class="sig-mini sig-widget">
-          <label for="npfoUnterschrift">Firma:</label>
-          <div class="sig-box">
-            <input type="text" id="npfoUnterschrift">
-            <canvas class="sig-pad sig-hidden" width="660" height="36"></canvas>
-          </div>
-          <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
-            <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
-            <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
-            <button type="button" class="sig-clear-btn sig-hidden">✕</button>
-          </span>
-        </div>
+        <div class="sig-mini"><label for="npfoUnterschrift">Firma:</label><input type="text" id="npfoUnterschrift"></div>
       </div>
     </div>
   </div>
@@ -303,18 +283,7 @@
     </div>
     <div class="approval-pair">
       <div class="approval-pair-item datum"><label for="veranstalterDatum">Data:</label><input type="text" id="veranstalterDatum"></div>
-      <div class="approval-pair-item sig sig-widget">
-        <label for="veranstalterUnterschrift">Firma:</label>
-        <div class="sig-box">
-          <input type="text" id="veranstalterUnterschrift">
-          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
-        </div>
-        <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
-          <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
-          <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
-          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
-        </span>
-      </div>
+      <div class="approval-pair-item sig"><label for="veranstalterUnterschrift">Firma:</label><input type="text" id="veranstalterUnterschrift"></div>
     </div>
   </div>
 
@@ -326,18 +295,7 @@
     </div>
     <div class="approval-pair">
       <div class="approval-pair-item datum"><label for="grundeigDatum">Data:</label><input type="text" id="grundeigDatum"></div>
-      <div class="approval-pair-item sig sig-widget">
-        <label for="grundeigUnterschrift">Firma:</label>
-        <div class="sig-box">
-          <input type="text" id="grundeigUnterschrift">
-          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
-        </div>
-        <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
-          <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
-          <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
-          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
-        </span>
-      </div>
+      <div class="approval-pair-item sig"><label for="grundeigUnterschrift">Firma:</label><input type="text" id="grundeigUnterschrift"></div>
     </div>
   </div>
 
@@ -349,18 +307,7 @@
     </div>
     <div class="approval-pair">
       <div class="approval-pair-item datum"><label for="gemeindeDatum">Data:</label><input type="text" id="gemeindeDatum"></div>
-      <div class="approval-pair-item sig sig-widget">
-        <label for="gemeindeUnterschrift">Firma:</label>
-        <div class="sig-box">
-          <input type="text" id="gemeindeUnterschrift">
-          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
-        </div>
-        <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
-          <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
-          <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
-          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
-        </span>
-      </div>
+      <div class="approval-pair-item sig"><label for="gemeindeUnterschrift">Firma:</label><input type="text" id="gemeindeUnterschrift"></div>
     </div>
   </div>
 
@@ -372,18 +319,7 @@
     </div>
     <div class="approval-pair">
       <div class="approval-pair-item datum"><label for="kantonDatum">Data:</label><input type="text" id="kantonDatum"></div>
-      <div class="approval-pair-item sig sig-widget">
-        <label for="kantonUnterschrift">Firma:</label>
-        <div class="sig-box">
-          <input type="text" id="kantonUnterschrift">
-          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
-        </div>
-        <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
-          <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
-          <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
-          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
-        </span>
-      </div>
+      <div class="approval-pair-item sig"><label for="kantonUnterschrift">Firma:</label><input type="text" id="kantonUnterschrift"></div>
     </div>
   </div>
 
@@ -407,7 +343,95 @@
     </div>
   </div>
 
+  <canvas class="pen-canvas" id="penCanvas" width="850" height="1200"></canvas>
 </form>
+
+<script>
+(function () {
+  const canvas = document.getElementById('penCanvas');
+  const ctx = canvas.getContext('2d');
+  const penBtn = document.getElementById('penBtn');
+  const clearBtn = document.getElementById('penClearBtn');
+  const form = document.getElementById('bazlForm');
+  ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
+
+  let penOn = false, drawing = false, hasDrawing = false;
+
+  function markDirty() { form.dispatchEvent(new Event('input', { bubbles: true })); }
+
+  function drawImageDataUrl(src) {
+    const img = new Image();
+    img.onload = function () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      hasDrawing = true;
+    };
+    img.src = src;
+  }
+
+  function sizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const prev = hasDrawing ? canvas.toDataURL('image/png') : null;
+    canvas.width = Math.max(1, Math.round(rect.width));
+    canvas.height = Math.max(1, Math.round(rect.height));
+    ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
+    if (prev) drawImageDataUrl(prev);
+  }
+
+  function pos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (canvas.width / rect.width),
+      y: (e.clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  canvas.addEventListener('pointerdown', function (e) {
+    if (!penOn) return;
+    canvas.setPointerCapture(e.pointerId);
+    drawing = true;
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    e.preventDefault();
+  });
+  canvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y); ctx.stroke();
+    e.preventDefault();
+  });
+  function endStroke() {
+    if (!drawing) return;
+    drawing = false;
+    hasDrawing = true;
+    markDirty();
+  }
+  canvas.addEventListener('pointerup', endStroke);
+  canvas.addEventListener('pointercancel', endStroke);
+
+  penBtn.addEventListener('click', function () {
+    penOn = !penOn;
+    penBtn.setAttribute('aria-pressed', String(penOn));
+    canvas.classList.toggle('pen-active', penOn);
+    clearBtn.hidden = !penOn;
+  });
+  clearBtn.addEventListener('click', function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawing = false;
+    markDirty();
+  });
+
+  window.addEventListener('load', sizeCanvas);
+
+  window.bazlPenCollect = function () {
+    return { penDrawing: hasDrawing ? canvas.toDataURL('image/png') : null };
+  };
+  window.bazlPenApply = function (data) {
+    if (data && data.penDrawing) drawImageDataUrl(data.penDrawing);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; }
+  };
+})();
+</script>
 
 <script>
 (function () {
@@ -429,6 +453,7 @@
     const data = {};
     form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => data[el.id] = el.value);
     form.querySelectorAll('input[type=checkbox]').forEach(el => data[el.id] = el.checked);
+    Object.assign(data, window.bazlPenCollect());
     return data;
   }
   function applyData(data) {
@@ -439,6 +464,7 @@
     form.querySelectorAll('input[type=checkbox]').forEach(el => {
       if (data[el.id] !== undefined) el.checked = data[el.id];
     });
+    window.bazlPenApply(data);
   }
 
   document.getElementById('saveBtn').addEventListener('click', function () {
@@ -484,156 +510,6 @@
 
   const existing = localStorage.getItem(FORM_KEY);
   if (existing) { applyData(JSON.parse(existing)); setStatus('Stato salvato caricato'); }
-})();
-</script>
-
-<script>
-(function () {
-  function initSigDual(root) {
-    const box = root.querySelector('.sig-box');
-    const valueEl = box.querySelector('input, textarea');
-    const canvas = box.querySelector('canvas.sig-pad');
-    const clearBtn = root.querySelector('.sig-clear-btn');
-    const kbBtn = root.querySelector('.sig-mode-btn[data-mode="keyboard"]');
-    const drawBtn = root.querySelector('.sig-mode-btn[data-mode="draw"]');
-    const ctx = canvas.getContext('2d');
-    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a1a1a';
-
-    const fallbackMode = root.dataset.sigDefault === 'draw' ? 'draw' : 'keyboard';
-    let mode = fallbackMode;
-    let textValue = valueEl.value || '';
-    let hasDrawing = false;
-    let drawing = false;
-
-    function setValue(v) {
-      if (valueEl.value === v) return;
-      valueEl.value = v;
-      valueEl.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    function setMode(next) {
-      mode = next;
-      kbBtn.setAttribute('aria-pressed', String(mode === 'keyboard'));
-      drawBtn.setAttribute('aria-pressed', String(mode === 'draw'));
-      valueEl.classList.toggle('sig-hidden', mode !== 'keyboard');
-      canvas.classList.toggle('sig-hidden', mode !== 'draw');
-      clearBtn.classList.toggle('sig-hidden', mode !== 'draw');
-      if (mode === 'keyboard') setValue(textValue);
-      else setValue(hasDrawing ? canvas.toDataURL('image/png') : '');
-    }
-
-    kbBtn.addEventListener('click', function () { if (mode !== 'keyboard') setMode('keyboard'); });
-    drawBtn.addEventListener('click', function () { if (mode !== 'draw') setMode('draw'); });
-    valueEl.addEventListener('input', function () { if (mode === 'keyboard') textValue = valueEl.value; });
-
-    function pos(e) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height)
-      };
-    }
-    canvas.addEventListener('pointerdown', function (e) {
-      canvas.setPointerCapture(e.pointerId);
-      drawing = true;
-      const p = pos(e);
-      ctx.beginPath(); ctx.moveTo(p.x, p.y);
-      e.preventDefault();
-    });
-    canvas.addEventListener('pointermove', function (e) {
-      if (!drawing) return;
-      const p = pos(e);
-      ctx.lineTo(p.x, p.y); ctx.stroke();
-      e.preventDefault();
-    });
-    function endStroke() {
-      if (!drawing) return;
-      drawing = false;
-      hasDrawing = true;
-      setValue(canvas.toDataURL('image/png'));
-    }
-    canvas.addEventListener('pointerup', endStroke);
-    canvas.addEventListener('pointercancel', endStroke);
-
-    clearBtn.addEventListener('click', function () {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      hasDrawing = false;
-      if (mode === 'draw') setValue('');
-    });
-
-    function restoreFromValue() {
-      const v = valueEl.value || '';
-      if (v.indexOf('data:image/') === 0) {
-        const img = new Image();
-        img.onload = function () {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
-        img.src = v;
-        hasDrawing = true;
-        setMode('draw');
-      } else {
-        textValue = v;
-        hasDrawing = false;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        setMode(v ? 'keyboard' : fallbackMode);
-      }
-    }
-
-    restoreFromValue();
-    return { restoreFromValue: restoreFromValue };
-  }
-
-  const controllers = Array.prototype.map.call(document.querySelectorAll('.sig-widget'), initSigDual);
-  const loadBtn = document.getElementById('loadBtn');
-  if (loadBtn) {
-    loadBtn.addEventListener('click', function () {
-      controllers.forEach(function (c) { c.restoreFromValue(); });
-    });
-  }
-})();
-</script>
-
-<script>
-(function () {
-  function autoGrow(el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-  }
-  function convert(input) {
-    const cs = getComputedStyle(input);
-    const ta = document.createElement('textarea');
-    Array.prototype.forEach.call(input.attributes, function (attr) {
-      if (attr.name === 'type') return;
-      ta.setAttribute(attr.name, attr.value);
-    });
-    ta.rows = 1;
-    ta.value = input.value;
-    ta.classList.add('autogrow-field');
-    ta.style.cssText =
-      'display:block; width:100%; resize:none; overflow:hidden; box-sizing:border-box;' +
-      'border:none; border-bottom:1px solid #333; background:transparent;' +
-      'font-family:' + cs.fontFamily + '; font-size:' + cs.fontSize + '; padding:' + cs.padding + '; line-height:1.3;';
-    input.replaceWith(ta);
-    autoGrow(ta);
-    ta.addEventListener('input', function () { autoGrow(ta); });
-    return ta;
-  }
-  const fields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
-  const converted = [];
-  fields.forEach(function (input) {
-    if (input.closest('.sig-widget') || input.classList.contains('no-autogrow')) return;
-    converted.push(convert(input));
-  });
-  window.addEventListener('resize', function () {
-    converted.forEach(autoGrow);
-  });
-  const loadBtn2 = document.getElementById('loadBtn');
-  if (loadBtn2) {
-    loadBtn2.addEventListener('click', function () {
-      converted.forEach(autoGrow);
-    });
-  }
 })();
 </script>
 
