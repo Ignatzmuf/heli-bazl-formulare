@@ -234,7 +234,7 @@
   <button type="button" id="printBtn">Print / Save as PDF</button>
   <button type="button" class="secondary" id="mailBtn">Send by e-mail</button>
   <button type="button" class="secondary pen-toggle" id="penBtn" aria-pressed="false">✍ Pen</button>
-  <button type="button" class="secondary" id="penClearBtn" hidden>Clear</button>
+  <button type="button" class="secondary" id="penClearBtn" hidden>Undo</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -365,11 +365,12 @@
   const canvas = document.getElementById('penCanvas');
   const ctx = canvas.getContext('2d');
   const penBtn = document.getElementById('penBtn');
-  const clearBtn = document.getElementById('penClearBtn');
+  const undoBtn = document.getElementById('penClearBtn');
   const form = document.getElementById('bazlForm');
   ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
 
   let penOn = false, drawing = false, hasDrawing = false;
+  let undoStack = [];
 
   function markDirty() { form.dispatchEvent(new Event('input', { bubbles: true })); }
 
@@ -404,6 +405,7 @@
     if (!penOn) return;
     canvas.setPointerCapture(e.pointerId);
     drawing = true;
+    undoStack.push(hasDrawing ? canvas.toDataURL('image/png') : null);
     const p = pos(e);
     ctx.beginPath(); ctx.moveTo(p.x, p.y);
     e.preventDefault();
@@ -427,11 +429,13 @@
     penOn = !penOn;
     penBtn.setAttribute('aria-pressed', String(penOn));
     canvas.classList.toggle('pen-active', penOn);
-    clearBtn.hidden = !penOn;
+    undoBtn.hidden = !penOn;
   });
-  clearBtn.addEventListener('click', function () {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    hasDrawing = false;
+  undoBtn.addEventListener('click', function () {
+    if (!undoStack.length) return;
+    const prev = undoStack.pop();
+    if (prev) drawImageDataUrl(prev);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; }
     markDirty();
   });
 
@@ -441,6 +445,7 @@
     return { penDrawing: hasDrawing ? canvas.toDataURL('image/png') : null };
   };
   window.bazlPenApply = function (data) {
+    undoStack = [];
     if (data && data.penDrawing) drawImageDataUrl(data.penDrawing);
     else { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; }
   };

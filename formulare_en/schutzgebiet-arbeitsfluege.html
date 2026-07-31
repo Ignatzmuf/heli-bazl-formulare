@@ -167,7 +167,7 @@
   <button type="button" id="printBtn">Print / Save as PDF</button>
   <button type="button" class="secondary" id="mailBtn">Send by e-mail</button>
   <button type="button" class="secondary pen-toggle" id="penBtn" aria-pressed="false">✍ Pen</button>
-  <button type="button" class="secondary" id="penClearBtn" hidden>Clear</button>
+  <button type="button" class="secondary" id="penClearBtn" hidden>Undo</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -368,13 +368,14 @@
 (function () {
   const canvasIds = ['penCanvas1', 'penCanvas2'];
   const penBtn = document.getElementById('penBtn');
-  const clearBtn = document.getElementById('penClearBtn');
+  const undoBtn = document.getElementById('penClearBtn');
   const form = document.getElementById('bazlForm');
   let penOn = false;
+  let undoStack = [];
 
   function markDirty() { form.dispatchEvent(new Event('input', { bubbles: true })); }
 
-  const pens = canvasIds.map(function (id) {
+  const pens = canvasIds.map(function (id, index) {
     const canvas = document.getElementById(id);
     const ctx = canvas.getContext('2d');
     ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
@@ -411,6 +412,7 @@
       if (!penOn) return;
       canvas.setPointerCapture(e.pointerId);
       drawing = true;
+      undoStack.push({ index: index, prev: hasDrawing ? canvas.toDataURL('image/png') : null });
       const p = pos(e);
       ctx.beginPath(); ctx.moveTo(p.x, p.y);
       e.preventDefault();
@@ -435,7 +437,6 @@
     return {
       canvas: canvas,
       setActive: function (on) { canvas.classList.toggle('pen-active', on); },
-      clear: function () { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; },
       collect: function () { return hasDrawing ? canvas.toDataURL('image/png') : null; },
       apply: function (src) { if (src) drawImageDataUrl(src); else { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; } }
     };
@@ -445,10 +446,12 @@
     penOn = !penOn;
     penBtn.setAttribute('aria-pressed', String(penOn));
     pens.forEach(function (p) { p.setActive(penOn); });
-    clearBtn.hidden = !penOn;
+    undoBtn.hidden = !penOn;
   });
-  clearBtn.addEventListener('click', function () {
-    pens.forEach(function (p) { p.clear(); });
+  undoBtn.addEventListener('click', function () {
+    if (!undoStack.length) return;
+    const last = undoStack.pop();
+    pens[last.index].apply(last.prev);
     markDirty();
   });
 
@@ -457,6 +460,7 @@
   };
   window.bazlPenApply = function (data) {
     if (!data) return;
+    undoStack = [];
     pens[0].apply(data.penDrawing1);
     pens[1].apply(data.penDrawing2);
   };
