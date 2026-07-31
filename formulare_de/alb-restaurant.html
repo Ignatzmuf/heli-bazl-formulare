@@ -135,6 +135,8 @@
     .sig-field label { margin-bottom: 2px; }
     .sig-field textarea { min-height: 22px; }
     .sig-mode-toggle, .sig-clear-btn { display: none !important; }
+    .sig-box { height: 22px; }
+    .autogrow-field { line-height: 1.15 !important; padding: 1px 2px !important; }
     .admin-footer { margin-top: 3px; padding-top: 3px; }
     @page { size: A4; margin: 7mm; }
   }
@@ -494,6 +496,7 @@
     });
     ta.rows = 1;
     ta.value = input.value;
+    ta.classList.add('autogrow-field');
     ta.style.cssText =
       'display:block; width:100%; resize:none; overflow:hidden; box-sizing:border-box;' +
       'border:none; border-bottom:1px solid #333; background:transparent;' +
@@ -506,7 +509,7 @@
   const fields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
   const converted = [];
   fields.forEach(function (input) {
-    if (input.closest('.sig-widget')) return;
+    if (input.closest('.sig-widget') || input.classList.contains('no-autogrow')) return;
     converted.push(convert(input));
   });
   window.addEventListener('resize', function () {
