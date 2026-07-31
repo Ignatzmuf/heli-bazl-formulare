@@ -59,7 +59,7 @@
   .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
     border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
   }
-  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .field-row input.invalid, .field-row textarea.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
   .required::after { content: " *"; color: var(--ch-red); }
 
   .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
@@ -77,19 +77,19 @@
   .sig-row label { font-size: 13px; }
   .sig-row input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 3px 2px; width: 100%; }
   .sig-row.sig-widget { grid-template-columns: 220px 1fr auto; }
-  .sig-widget .sig-draw-panel { grid-column: 1 / -1; margin-top: 6px; }
+
+  .sig-box { position: relative; width: 100%; height: 44px; border: 1px solid #333; background: #fff; box-sizing: border-box; overflow: hidden; }
+  .sig-box input, .sig-box textarea { display: block; width: 100%; height: 100%; box-sizing: border-box; border: none; background: transparent; padding: 4px 6px; font-family: inherit; font-size: 13px; resize: none; }
+  .sig-box canvas.sig-pad { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 
   .sig-mode-toggle { display: inline-flex; gap: 4px; }
-  .sig-mode-btn {
+  .sig-mode-btn, .sig-clear-btn {
     font-size: 11px; line-height: 1; padding: 4px 8px; border: 1px solid #999; background: #fff;
     color: var(--ink); border-radius: 2px; cursor: pointer; font-family: inherit;
   }
   .sig-mode-btn[aria-pressed="true"] { background: var(--ch-red); border-color: var(--ch-red); color: #fff; font-weight: bold; }
-  .sig-mode-btn:hover { filter: brightness(1.05); }
+  .sig-mode-btn:hover, .sig-clear-btn:hover { filter: brightness(1.05); }
   .sig-hidden { display: none !important; }
-  canvas.sig-pad { border: 1px solid #333; width: 100%; height: 90px; background: #fff; touch-action: none; cursor: crosshair; }
-  .sig-actions { margin-top: 4px; }
-  .sig-actions button { font-size: 11px; padding: 3px 8px; border: 1px solid #999; background: #fff; cursor: pointer; border-radius: 2px; }
 
   .page-footer { font-size: 11px; color: #555; text-align: right; margin-top: 10px; font-style: italic; }
 
@@ -143,8 +143,7 @@
     textarea.tall { min-height: 46px; }
     textarea.medium { min-height: 26px; }
     .sig-row { margin-top: 5px; }
-    .sig-mode-toggle, .sig-actions { display: none !important; }
-    canvas.sig-pad { height: 65px; }
+    .sig-mode-toggle, .sig-clear-btn { display: none !important; }
     .page-footer { margin-top: 4px; }
     .authority-section { padding: 6px 16px; margin-bottom: 6px; }
     .authority-section .badge { margin-bottom: 5px; }
@@ -252,15 +251,15 @@
 
       <div class="sig-row sig-widget">
         <label for="sigNpfo">Date and signature of the flight operations manager (NPFO):</label>
-        <input type="text" id="sigNpfo">
+        <div class="sig-box">
+          <input type="text" id="sigNpfo">
+          <canvas class="sig-pad sig-hidden" width="660" height="44"></canvas>
+        </div>
         <span class="sig-mode-toggle" role="group" aria-label="Input mode">
           <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨ Keyboard</button>
           <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍ Draw</button>
+          <button type="button" class="sig-clear-btn sig-hidden">Clear</button>
         </span>
-        <div class="sig-draw-panel sig-hidden">
-          <canvas class="sig-pad" width="700" height="130"></canvas>
-          <div class="sig-actions"><button type="button" class="sig-clear-btn">Clear</button></div>
-        </div>
       </div>
     </div>
 
@@ -359,15 +358,15 @@
 
       <div class="sig-row sig-widget">
         <label for="sigBehoerde">Date, name, stamp/signature:</label>
-        <input type="text" id="sigBehoerde">
+        <div class="sig-box">
+          <input type="text" id="sigBehoerde">
+          <canvas class="sig-pad sig-hidden" width="660" height="44"></canvas>
+        </div>
         <span class="sig-mode-toggle" role="group" aria-label="Input mode">
           <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨ Keyboard</button>
           <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍ Draw</button>
+          <button type="button" class="sig-clear-btn sig-hidden">Clear</button>
         </span>
-        <div class="sig-draw-panel sig-hidden">
-          <canvas class="sig-pad" width="700" height="130"></canvas>
-          <div class="sig-actions"><button type="button" class="sig-clear-btn">Clear</button></div>
-        </div>
       </div>
     </div>
 
@@ -471,10 +470,10 @@
 <script>
 (function () {
   function initSigDual(root) {
-    const valueEl = root.querySelector('input, textarea');
-    const drawPanel = root.querySelector('.sig-draw-panel');
-    const canvas = drawPanel.querySelector('canvas.sig-pad');
-    const clearBtn = drawPanel.querySelector('.sig-clear-btn');
+    const box = root.querySelector('.sig-box');
+    const valueEl = box.querySelector('input, textarea');
+    const canvas = box.querySelector('canvas.sig-pad');
+    const clearBtn = root.querySelector('.sig-clear-btn');
     const kbBtn = root.querySelector('.sig-mode-btn[data-mode="keyboard"]');
     const drawBtn = root.querySelector('.sig-mode-btn[data-mode="draw"]');
     const ctx = canvas.getContext('2d');
@@ -497,7 +496,8 @@
       kbBtn.setAttribute('aria-pressed', String(mode === 'keyboard'));
       drawBtn.setAttribute('aria-pressed', String(mode === 'draw'));
       valueEl.classList.toggle('sig-hidden', mode !== 'keyboard');
-      drawPanel.classList.toggle('sig-hidden', mode !== 'draw');
+      canvas.classList.toggle('sig-hidden', mode !== 'draw');
+      clearBtn.classList.toggle('sig-hidden', mode !== 'draw');
       if (mode === 'keyboard') setValue(textValue);
       else setValue(hasDrawing ? canvas.toDataURL('image/png') : '');
     }
@@ -569,6 +569,48 @@
   if (loadBtn) {
     loadBtn.addEventListener('click', function () {
       controllers.forEach(function (c) { c.restoreFromValue(); });
+    });
+  }
+})();
+</script>
+
+<script>
+(function () {
+  function autoGrow(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+  function convert(input) {
+    const cs = getComputedStyle(input);
+    const ta = document.createElement('textarea');
+    Array.prototype.forEach.call(input.attributes, function (attr) {
+      if (attr.name === 'type') return;
+      ta.setAttribute(attr.name, attr.value);
+    });
+    ta.rows = 1;
+    ta.value = input.value;
+    ta.style.cssText =
+      'display:block; width:100%; resize:none; overflow:hidden; box-sizing:border-box;' +
+      'border:none; border-bottom:1px solid #333; background:transparent;' +
+      'font-family:' + cs.fontFamily + '; font-size:' + cs.fontSize + '; padding:' + cs.padding + '; line-height:1.3;';
+    input.replaceWith(ta);
+    autoGrow(ta);
+    ta.addEventListener('input', function () { autoGrow(ta); });
+    return ta;
+  }
+  const fields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+  const converted = [];
+  fields.forEach(function (input) {
+    if (input.closest('.sig-widget')) return;
+    converted.push(convert(input));
+  });
+  window.addEventListener('resize', function () {
+    converted.forEach(autoGrow);
+  });
+  const loadBtn2 = document.getElementById('loadBtn');
+  if (loadBtn2) {
+    loadBtn2.addEventListener('click', function () {
+      converted.forEach(autoGrow);
     });
   }
 })();

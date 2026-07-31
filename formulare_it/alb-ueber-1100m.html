@@ -61,7 +61,7 @@
   .field-row input[type=text], .field-row input[type=email], .field-row input[type=tel] {
     border: none; border-bottom: 1px solid #333; padding: 3px 2px; font-size: 13.5px; font-family: inherit; width: 100%;
   }
-  .field-row input.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
+  .field-row input.invalid, .field-row textarea.invalid { border-bottom-color: var(--ch-red); background: #fff4f4; }
   .required::after { content: " *"; color: var(--ch-red); }
 
   .reasons-box { border: 1px solid #999; border-top: none; padding: 12px 16px; margin-bottom: 4px; font-size: 13.5px; }
@@ -102,19 +102,19 @@
   .approval-pair-item input { border: none; border-bottom: 1px solid #333; font-size: 13px; font-family: inherit; padding: 2px; width: 100%; }
 
   .sig-mode-toggle { display: inline-flex; gap: 4px; }
-  .sig-mode-btn {
+  .sig-mode-btn, .sig-clear-btn {
     font-size: 10.5px; line-height: 1; padding: 3px 6px; border: 1px solid #999; background: #fff;
     color: var(--ink); border-radius: 2px; cursor: pointer; font-family: inherit;
   }
   .sig-mode-btn[aria-pressed="true"] { background: var(--ch-red); border-color: var(--ch-red); color: #fff; font-weight: bold; }
-  .sig-mode-btn:hover { filter: brightness(1.05); }
+  .sig-mode-btn:hover, .sig-clear-btn:hover { filter: brightness(1.05); }
   .sig-hidden { display: none !important; }
-  canvas.sig-pad { border: 1px solid #333; width: 100%; height: 80px; background: #fff; touch-action: none; cursor: crosshair; }
-  .sig-actions { margin-top: 4px; }
-  .sig-actions button { font-size: 11px; padding: 3px 8px; border: 1px solid #999; background: #fff; cursor: pointer; border-radius: 2px; }
   .sig-mini.sig-widget { grid-template-columns: 110px 1fr auto; }
   .approval-pair-item.sig.sig-widget { grid-template-columns: 90px 1fr auto; }
-  .sig-widget .sig-draw-panel { grid-column: 1 / -1; margin-top: 6px; }
+
+  .sig-box { position: relative; width: 100%; height: 36px; border: 1px solid #333; background: #fff; box-sizing: border-box; overflow: hidden; }
+  .sig-box input, .sig-box textarea { display: block; width: 100%; height: 100%; box-sizing: border-box; border: none; background: transparent; padding: 2px 5px; font-family: inherit; font-size: 13px; resize: none; }
+  .sig-box canvas.sig-pad { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 
   .admin-footer { border-top: 1px solid #999; padding-top: 8px; font-size: 9.5px; color: #444; margin-top: 20px; }
   .admin-footer .admin-title { text-align: center; font-style: italic; letter-spacing: .5px; color: #666; margin-bottom: 4px; }
@@ -145,8 +145,7 @@
     .approval-box { padding: 3px 12px; margin-bottom: 2px; }
     .approval-box .title-row { margin-bottom: 2px; }
     .approval-row { margin-bottom: 1px; }
-    .sig-mode-toggle, .sig-actions { display: none !important; }
-    canvas.sig-pad { height: 55px; }
+    .sig-mode-toggle, .sig-clear-btn { display: none !important; }
     .admin-footer { margin-top: 3px; padding-top: 3px; }
     @page { size: A4; margin: 7mm; }
   }
@@ -279,15 +278,15 @@
         <div class="sig-mini"><label for="npfoDatum">Data:</label><input type="text" id="npfoDatum"></div>
         <div class="sig-mini sig-widget">
           <label for="npfoUnterschrift">Firma:</label>
-          <input type="text" id="npfoUnterschrift">
+          <div class="sig-box">
+            <input type="text" id="npfoUnterschrift">
+            <canvas class="sig-pad sig-hidden" width="660" height="36"></canvas>
+          </div>
           <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
             <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
             <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
+            <button type="button" class="sig-clear-btn sig-hidden">✕</button>
           </span>
-          <div class="sig-draw-panel sig-hidden">
-            <canvas class="sig-pad" width="700" height="120"></canvas>
-            <div class="sig-actions"><button type="button" class="sig-clear-btn">Cancella</button></div>
-          </div>
         </div>
       </div>
     </div>
@@ -303,15 +302,15 @@
       <div class="approval-pair-item datum"><label for="veranstalterDatum">Data:</label><input type="text" id="veranstalterDatum"></div>
       <div class="approval-pair-item sig sig-widget">
         <label for="veranstalterUnterschrift">Firma:</label>
-        <input type="text" id="veranstalterUnterschrift">
+        <div class="sig-box">
+          <input type="text" id="veranstalterUnterschrift">
+          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
+        </div>
         <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
           <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
           <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
+          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
         </span>
-        <div class="sig-draw-panel sig-hidden">
-          <canvas class="sig-pad" width="380" height="110"></canvas>
-          <div class="sig-actions"><button type="button" class="sig-clear-btn">Cancella</button></div>
-        </div>
       </div>
     </div>
   </div>
@@ -326,15 +325,15 @@
       <div class="approval-pair-item datum"><label for="grundeigDatum">Data:</label><input type="text" id="grundeigDatum"></div>
       <div class="approval-pair-item sig sig-widget">
         <label for="grundeigUnterschrift">Firma:</label>
-        <input type="text" id="grundeigUnterschrift">
+        <div class="sig-box">
+          <input type="text" id="grundeigUnterschrift">
+          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
+        </div>
         <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
           <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
           <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
+          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
         </span>
-        <div class="sig-draw-panel sig-hidden">
-          <canvas class="sig-pad" width="380" height="110"></canvas>
-          <div class="sig-actions"><button type="button" class="sig-clear-btn">Cancella</button></div>
-        </div>
       </div>
     </div>
   </div>
@@ -349,15 +348,15 @@
       <div class="approval-pair-item datum"><label for="gemeindeDatum">Data:</label><input type="text" id="gemeindeDatum"></div>
       <div class="approval-pair-item sig sig-widget">
         <label for="gemeindeUnterschrift">Firma:</label>
-        <input type="text" id="gemeindeUnterschrift">
+        <div class="sig-box">
+          <input type="text" id="gemeindeUnterschrift">
+          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
+        </div>
         <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
           <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
           <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
+          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
         </span>
-        <div class="sig-draw-panel sig-hidden">
-          <canvas class="sig-pad" width="380" height="110"></canvas>
-          <div class="sig-actions"><button type="button" class="sig-clear-btn">Cancella</button></div>
-        </div>
       </div>
     </div>
   </div>
@@ -372,15 +371,15 @@
       <div class="approval-pair-item datum"><label for="kantonDatum">Data:</label><input type="text" id="kantonDatum"></div>
       <div class="approval-pair-item sig sig-widget">
         <label for="kantonUnterschrift">Firma:</label>
-        <input type="text" id="kantonUnterschrift">
+        <div class="sig-box">
+          <input type="text" id="kantonUnterschrift">
+          <canvas class="sig-pad sig-hidden" width="300" height="36"></canvas>
+        </div>
         <span class="sig-mode-toggle" role="group" aria-label="Modalità di inserimento">
           <button type="button" class="sig-mode-btn" data-mode="keyboard" aria-pressed="true">⌨</button>
           <button type="button" class="sig-mode-btn" data-mode="draw" aria-pressed="false">✍</button>
+          <button type="button" class="sig-clear-btn sig-hidden">✕</button>
         </span>
-        <div class="sig-draw-panel sig-hidden">
-          <canvas class="sig-pad" width="380" height="110"></canvas>
-          <div class="sig-actions"><button type="button" class="sig-clear-btn">Cancella</button></div>
-        </div>
       </div>
     </div>
   </div>
@@ -488,10 +487,10 @@
 <script>
 (function () {
   function initSigDual(root) {
-    const valueEl = root.querySelector('input, textarea');
-    const drawPanel = root.querySelector('.sig-draw-panel');
-    const canvas = drawPanel.querySelector('canvas.sig-pad');
-    const clearBtn = drawPanel.querySelector('.sig-clear-btn');
+    const box = root.querySelector('.sig-box');
+    const valueEl = box.querySelector('input, textarea');
+    const canvas = box.querySelector('canvas.sig-pad');
+    const clearBtn = root.querySelector('.sig-clear-btn');
     const kbBtn = root.querySelector('.sig-mode-btn[data-mode="keyboard"]');
     const drawBtn = root.querySelector('.sig-mode-btn[data-mode="draw"]');
     const ctx = canvas.getContext('2d');
@@ -514,7 +513,8 @@
       kbBtn.setAttribute('aria-pressed', String(mode === 'keyboard'));
       drawBtn.setAttribute('aria-pressed', String(mode === 'draw'));
       valueEl.classList.toggle('sig-hidden', mode !== 'keyboard');
-      drawPanel.classList.toggle('sig-hidden', mode !== 'draw');
+      canvas.classList.toggle('sig-hidden', mode !== 'draw');
+      clearBtn.classList.toggle('sig-hidden', mode !== 'draw');
       if (mode === 'keyboard') setValue(textValue);
       else setValue(hasDrawing ? canvas.toDataURL('image/png') : '');
     }
@@ -586,6 +586,48 @@
   if (loadBtn) {
     loadBtn.addEventListener('click', function () {
       controllers.forEach(function (c) { c.restoreFromValue(); });
+    });
+  }
+})();
+</script>
+
+<script>
+(function () {
+  function autoGrow(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+  function convert(input) {
+    const cs = getComputedStyle(input);
+    const ta = document.createElement('textarea');
+    Array.prototype.forEach.call(input.attributes, function (attr) {
+      if (attr.name === 'type') return;
+      ta.setAttribute(attr.name, attr.value);
+    });
+    ta.rows = 1;
+    ta.value = input.value;
+    ta.style.cssText =
+      'display:block; width:100%; resize:none; overflow:hidden; box-sizing:border-box;' +
+      'border:none; border-bottom:1px solid #333; background:transparent;' +
+      'font-family:' + cs.fontFamily + '; font-size:' + cs.fontSize + '; padding:' + cs.padding + '; line-height:1.3;';
+    input.replaceWith(ta);
+    autoGrow(ta);
+    ta.addEventListener('input', function () { autoGrow(ta); });
+    return ta;
+  }
+  const fields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+  const converted = [];
+  fields.forEach(function (input) {
+    if (input.closest('.sig-widget')) return;
+    converted.push(convert(input));
+  });
+  window.addEventListener('resize', function () {
+    converted.forEach(autoGrow);
+  });
+  const loadBtn2 = document.getElementById('loadBtn');
+  if (loadBtn2) {
+    loadBtn2.addEventListener('click', function () {
+      converted.forEach(autoGrow);
     });
   }
 })();
