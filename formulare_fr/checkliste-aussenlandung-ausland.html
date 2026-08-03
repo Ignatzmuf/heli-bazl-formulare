@@ -107,6 +107,7 @@
   <button type="button" class="secondary" id="saveBtn">Enregistrer</button>
   <button type="button" id="printBtn">Imprimer / Enregistrer en PDF</button>
   <button type="button" class="secondary" id="mailBtn">Envoyer par e-mail</button>
+  <button type="button" class="secondary" id="resetBtn">Réinitialiser le formulaire</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -259,6 +260,16 @@
     applyData(JSON.parse(raw));
     dirty = false;
     setStatus('Chargé ' + new Date().toLocaleTimeString('fr-CH'));
+  });
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (!confirm('Voulez-vous vraiment réinitialiser le formulaire ? Toutes les saisies et la signature seront définitivement supprimées.')) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => { el.value = ''; el.classList.remove('invalid'); });
+    form.querySelectorAll('input[type=checkbox], input[type=radio]').forEach(el => el.checked = false);
+    if (window.bazlPenReset) window.bazlPenReset();
+    localStorage.removeItem(FORM_KEY);
+    dirty = false;
+    setStatus('Formulaire réinitialisé');
+    if (typeof updateProgress === 'function') updateProgress();
   });
 
   document.getElementById('printBtn').addEventListener('click', function () { window.print(); });

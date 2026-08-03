@@ -107,6 +107,7 @@
   <button type="button" class="secondary" id="saveBtn">Salva</button>
   <button type="button" id="printBtn">Stampa / Salva come PDF</button>
   <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+  <button type="button" class="secondary" id="resetBtn">Ripristina modulo</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -259,6 +260,16 @@
     applyData(JSON.parse(raw));
     dirty = false;
     setStatus('Caricato ' + new Date().toLocaleTimeString('it-CH'));
+  });
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (!confirm('Vuoi davvero ripristinare il modulo? Tutti i dati inseriti e la firma verranno eliminati definitivamente.')) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => { el.value = ''; el.classList.remove('invalid'); });
+    form.querySelectorAll('input[type=checkbox], input[type=radio]').forEach(el => el.checked = false);
+    if (window.bazlPenReset) window.bazlPenReset();
+    localStorage.removeItem(FORM_KEY);
+    dirty = false;
+    setStatus('Modulo ripristinato');
+    if (typeof updateProgress === 'function') updateProgress();
   });
 
   document.getElementById('printBtn').addEventListener('click', function () { window.print(); });

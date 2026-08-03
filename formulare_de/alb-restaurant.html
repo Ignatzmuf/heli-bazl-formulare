@@ -30,6 +30,11 @@
 
   .sheet { position: relative; max-width: 850px; margin: 24px auto 60px; background: #fff; padding: 40px 48px; box-shadow: 0 0 12px rgba(0,0,0,.25); }
   .pen-toggle[aria-pressed="true"] { background: var(--ch-red); }
+  .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 32px; padding: 0; }
+  .icon-btn img { width: 18px; height: 18px; filter: brightness(0) invert(1); }
+  .pen-toggle .icon-keyboard { display: none; }
+  .pen-toggle[aria-pressed="true"] .icon-pen { display: none; }
+  .pen-toggle[aria-pressed="true"] .icon-keyboard { display: inline-block; }
   .toolbar [hidden] { display: none !important; }
   .pen-canvas {
     position: absolute; left: 0; top: 0; width: 100%; height: 100%;
@@ -143,8 +148,14 @@
   <button type="button" class="secondary" id="saveBtn">Speichern</button>
   <button type="button" id="printBtn">Drucken / Als PDF</button>
   <button type="button" class="secondary" id="mailBtn">Per E-Mail senden</button>
-  <button type="button" class="secondary pen-toggle" id="penBtn" aria-pressed="false">✍ Stift</button>
-  <button type="button" class="secondary" id="penClearBtn" hidden>Rückgängig</button>
+  <button type="button" class="secondary pen-toggle icon-btn" id="penBtn" aria-pressed="false" title="Stift-Modus" aria-label="Stift-Modus">
+    <img class="icon-pen" src="../ICON/pen.png" alt="">
+    <img class="icon-keyboard" src="../ICON/keyboard.png" alt="">
+  </button>
+  <button type="button" class="secondary icon-btn" id="penClearBtn" hidden title="Rückgängig" aria-label="Rückgängig">
+    <img src="../ICON/eraser.png" alt="">
+  </button>
+  <button type="button" class="secondary" id="resetBtn">Formular zurücksetzen</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -334,6 +345,7 @@
     penBtn.setAttribute('aria-pressed', String(penOn));
     canvas.classList.toggle('pen-active', penOn);
     undoBtn.hidden = !penOn;
+    penBtn.title = penBtn.ariaLabel = penOn ? 'Zurück zur Tastatur' : 'Stift-Modus';
   });
   undoBtn.addEventListener('click', function () {
     if (!undoStack.length) return;
@@ -352,6 +364,18 @@
     undoStack = [];
     if (data && data.penDrawing) drawImageDataUrl(data.penDrawing);
     else { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawing = false; }
+  };
+  window.bazlPenReset = function () {
+    undoStack = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawing = false;
+    if (penOn) {
+      penOn = false;
+      penBtn.setAttribute('aria-pressed', 'false');
+      canvas.classList.remove('pen-active');
+      undoBtn.hidden = true;
+      penBtn.title = penBtn.ariaLabel = 'Stift-Modus';
+    }
   };
 })();
 </script>
@@ -401,6 +425,16 @@
     applyData(JSON.parse(raw));
     dirty = false;
     setStatus('Geladen ' + new Date().toLocaleTimeString('de-CH'));
+  });
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (!confirm('Möchten Sie das Formular wirklich zurücksetzen? Alle Eingaben und die Unterschrift werden unwiderruflich gelöscht.')) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => { el.value = ''; el.classList.remove('invalid'); });
+    form.querySelectorAll('input[type=checkbox], input[type=radio]').forEach(el => el.checked = false);
+    if (window.bazlPenReset) window.bazlPenReset();
+    localStorage.removeItem(FORM_KEY);
+    dirty = false;
+    setStatus('Formular zurückgesetzt');
+    if (typeof updateProgress === 'function') updateProgress();
   });
 
   function validateRequired() {

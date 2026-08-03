@@ -107,6 +107,7 @@
   <button type="button" class="secondary" id="saveBtn">Speichern</button>
   <button type="button" id="printBtn">Drucken / Als PDF</button>
   <button type="button" class="secondary" id="mailBtn">Per E-Mail senden</button>
+  <button type="button" class="secondary" id="resetBtn">Formular zurücksetzen</button>
 </div>
 
 <form class="sheet" id="bazlForm" novalidate>
@@ -259,6 +260,16 @@
     applyData(JSON.parse(raw));
     dirty = false;
     setStatus('Geladen ' + new Date().toLocaleTimeString('de-CH'));
+  });
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (!confirm('Möchten Sie das Formular wirklich zurücksetzen? Alle Eingaben und die Unterschrift werden unwiderruflich gelöscht.')) return;
+    form.querySelectorAll('input[type=text], input[type=email], input[type=tel], textarea').forEach(el => { el.value = ''; el.classList.remove('invalid'); });
+    form.querySelectorAll('input[type=checkbox], input[type=radio]').forEach(el => el.checked = false);
+    if (window.bazlPenReset) window.bazlPenReset();
+    localStorage.removeItem(FORM_KEY);
+    dirty = false;
+    setStatus('Formular zurückgesetzt');
+    if (typeof updateProgress === 'function') updateProgress();
   });
 
   document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
