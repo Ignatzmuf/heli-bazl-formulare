@@ -167,6 +167,7 @@
   <button type="button" class="secondary" id="resetBtn">Réinitialiser le formulaire</button>
   <button type="button" id="printBtn">Imprimer / Enregistrer en PDF</button>
   <button type="button" class="secondary" id="mailBtn">Envoyer par e-mail</button>
+  <button type="button" class="secondary" id="shareBtn">Envoyer le formulaire</button>
   <button type="button" class="secondary pen-toggle icon-btn" id="penBtn" aria-pressed="false" title="Mode stylo" aria-label="Mode stylo">
     <img class="icon-pen" src="../ICON/pen.png" alt="">
     <img class="icon-keyboard" src="../ICON/keyboard.png" alt="">
@@ -176,7 +177,7 @@
   </button>
 </div>
 
-<form class="sheet" id="bazlForm" novalidate>
+<form class="sheet" id="bazlForm" data-form-key="bazl_alb_ueber_1100m" novalidate>
 
   <div class="header">
     <div class="header-left">
@@ -551,8 +552,11 @@
 
   const existing = localStorage.getItem(FORM_KEY);
   if (existing) { applyData(JSON.parse(existing)); setStatus('État enregistré chargé'); }
+  window.bazlCollectData = collectData;
+  window.bazlApplyData = applyData;
 })();
 </script>
 
+<script src="../shared/bazl-share.js"></script>
 </body>
 </html>

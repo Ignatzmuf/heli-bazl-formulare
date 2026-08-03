@@ -167,6 +167,7 @@
   <button type="button" class="secondary" id="resetBtn">Ripristina modulo</button>
   <button type="button" id="printBtn">Stampa / Salva come PDF</button>
   <button type="button" class="secondary" id="mailBtn">Invia per e-mail</button>
+  <button type="button" class="secondary" id="shareBtn">Invia modulo</button>
   <button type="button" class="secondary pen-toggle icon-btn" id="penBtn" aria-pressed="false" title="Modalità penna" aria-label="Modalità penna">
     <img class="icon-pen" src="../ICON/pen.png" alt="">
     <img class="icon-keyboard" src="../ICON/keyboard.png" alt="">
@@ -176,7 +177,7 @@
   </button>
 </div>
 
-<form class="sheet" id="bazlForm" novalidate>
+<form class="sheet" id="bazlForm" data-form-key="bazl_alb_ueber_1100m" novalidate>
 
   <div class="header">
     <div class="header-left">
@@ -551,8 +552,11 @@
 
   const existing = localStorage.getItem(FORM_KEY);
   if (existing) { applyData(JSON.parse(existing)); setStatus('Stato salvato caricato'); }
+  window.bazlCollectData = collectData;
+  window.bazlApplyData = applyData;
 })();
 </script>
 
+<script src="../shared/bazl-share.js"></script>
 </body>
 </html>

@@ -151,6 +151,7 @@
   <button type="button" class="secondary" id="resetBtn">Reset form</button>
   <button type="button" id="printBtn">Print / Save as PDF</button>
   <button type="button" class="secondary" id="mailBtn">Send by e-mail</button>
+  <button type="button" class="secondary" id="shareBtn">Send form</button>
   <button type="button" class="secondary pen-toggle icon-btn" id="penBtn" aria-pressed="false" title="Pen mode" aria-label="Pen mode">
     <img class="icon-pen" src="../ICON/pen.png" alt="">
     <img class="icon-keyboard" src="../ICON/keyboard.png" alt="">
@@ -160,7 +161,7 @@
   </button>
 </div>
 
-<form class="sheet" id="bazlForm" novalidate>
+<form class="sheet" id="bazlForm" data-form-key="bazl_alb_restaurant" novalidate>
 
   <div class="header">
     <div class="header-left">
@@ -468,8 +469,11 @@
 
   const existing = localStorage.getItem(FORM_KEY);
   if (existing) { applyData(JSON.parse(existing)); setStatus('Saved state loaded'); }
+  window.bazlCollectData = collectData;
+  window.bazlApplyData = applyData;
 })();
 </script>
 
+<script src="../shared/bazl-share.js"></script>
 </body>
 </html>
