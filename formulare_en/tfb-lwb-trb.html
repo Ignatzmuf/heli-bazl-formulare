@@ -384,6 +384,7 @@
 
   let penOn = false, drawing = false, hasDrawing = false;
   let undoStack = [];
+  let lastPoint = null;
 
   function markDirty() { form.dispatchEvent(new Event('input', { bubbles: true })); }
 
@@ -400,9 +401,10 @@
   function sizeCanvas() {
     const rect = canvas.getBoundingClientRect();
     const prev = hasDrawing ? canvas.toDataURL('image/png') : null;
-    canvas.width = Math.max(1, Math.round(rect.width));
-    canvas.height = Math.max(1, Math.round(rect.height));
-    ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.lineWidth = 2.2 * dpr; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a1a';
     if (prev) drawImageDataUrl(prev);
   }
 
@@ -419,14 +421,20 @@
     canvas.setPointerCapture(e.pointerId);
     drawing = true;
     undoStack.push(hasDrawing ? canvas.toDataURL('image/png') : null);
-    const p = pos(e);
-    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    lastPoint = pos(e);
+    ctx.beginPath(); ctx.moveTo(lastPoint.x, lastPoint.y);
     e.preventDefault();
   });
   canvas.addEventListener('pointermove', function (e) {
     if (!drawing) return;
-    const p = pos(e);
-    ctx.lineTo(p.x, p.y); ctx.stroke();
+    const events = (e.getCoalescedEvents && e.getCoalescedEvents()) || [e];
+    events.forEach(function (ev) {
+      const p = pos(ev);
+      const mid = { x: (lastPoint.x + p.x) / 2, y: (lastPoint.y + p.y) / 2 };
+      ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, mid.x, mid.y);
+      lastPoint = p;
+    });
+    ctx.stroke();
     e.preventDefault();
   });
   function endStroke() {
